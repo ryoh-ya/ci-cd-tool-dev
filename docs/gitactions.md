@@ -29,6 +29,8 @@ https://appj.pglikers.com/knowledge/protect.knowledge/view_edit/44
       - [mailxコマンドで直接メール送信](#mailxコマンドで直接メール送信)
       - [Slackや他の通知方法](#slackや他の通知方法)
   - [ローカル環境でGit Actionを実行する](#ローカル環境でgit-actionを実行する)
+    - [Actツール](#actツール)
+      - [使い方](#使い方)
 
 
 ワークフローをGUIから作成する方法
@@ -564,4 +566,65 @@ jobs:
 
 ### ローカル環境でGit Actionを実行する
 
+#### Actツール
 
+
+* GitHub Actionsワークフローをローカルで実行できるツール。
+* GitHub Actionsの .github/workflows ファイルをそのまま使用可能。
+* Dockerコンテナを使ってローカル環境でステップを再現。
+* GitHub Actionsを学習・テストするのに最適
+
+**(用途)**
+* ローカルでworkflowをテストする
+  * プッシュせずに問題を修正できるため、時間とリソースを節約
+* リポジトリのWorkflowをローカルで実行
+  * 既存のリポジトリのWorkflowをトリガーイベントを指定してローカルで実行
+* GitActionsの学習
+
+**(制約)**
+* actは内部的にDockerを使用しているため、Dockerが動作可能な環境が必要
+* GitHub Actionsの完全な再現は難しい
+  * actに対応していない一部のActionsや機能（プラグインなど）がある
+    * actions/cache
+* GitHubリソースへの依存
+  * プライベートリポジトリやGitHub APIを利用するWorkflowでは、GITHUB_TOKENが必要になる
+
+
+**(手順)**
+1. Dockerファイルを作成する
+    * [Dockerfile](../actions/Dockerfile)
+
+
+**GITHUB_TOKENは必要か？**
+
+* 必要になるケース
+  * プライベートリポジトリを操作する場合
+    * actを使ってプライベートリポジトリのワークフローをテストするには、GITHUB_TOKENが必要です
+    * プライベートリポジトリにアクセスするにはGitHubのPersonal Access Token（PAT）が必要です。
+    * PATには少なくとも repo 権限が必要です。
+  * APIリクエスト制限を回避したい場合:
+    * actはGitHub APIを利用してリソースを取得しますが、未認証のリクエストは1時間あたりの制限（60リクエスト）があります
+    * GITHUB_TOKENを渡すと、認証済みとして扱われるため、APIリクエストの制限が緩和（5,000リクエスト/時間）されます
+
+
+* ワークフローのテスト対象がパブリックリポジトリの場合、GITHUB_TOKENは必須ではありません。
+* ローカルでの簡易テスト
+* ワークフローが外部リソース（GitHub APIやリポジトリデータなど）に依存していない場合、GITHUB_TOKENなしで動作します。
+
+##### 使い方
+
+**actでワークフローを実行**
+```sh
+act
+```
+
+pushイベントを実行したい場合
+
+```sh
+act push
+```
+
+デバッグ情報を含める場合
+```sh
+act v
+```

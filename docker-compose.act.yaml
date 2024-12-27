@@ -1,0 +1,14 @@
+services:
+  act:
+    build:
+      context: actions  # Dockerfileの場所（カレントディレクトリ）
+    image: act-docker
+    container_name: act-container
+    volumes:
+      - ./.github/workflows:/workspace/.github/workflows  # ローカルディレクトリをコンテナ内にマウント
+      - /var/run/docker.sock:/var/run/docker.sock  # Dockerデーモンをコンテナ内で利用可能に
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}  # 環境変数でGitHubトークンを渡す
+    working_dir: /workspace
+    stdin_open: true  # 対話型セッションを有効化
+    tty: true         # ターミナルをサポート
