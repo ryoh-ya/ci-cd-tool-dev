@@ -16,6 +16,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
       - [Dockerで一時的なPython環境を作成する方法](#dockerで一時的なpython環境を作成する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
       - [Jenkinsfile Runner](#jenkinsfile-runner)
+      - [jpi拡張子のWarningが表示される場合の対処方法](#jpi拡張子のwarningが表示される場合の対処方法)
 
 * Jenkins
   * オープンソースの継続的インテグレーション（CI）および継続的デリバリー（CD）ツール
@@ -221,6 +222,7 @@ pipeline {
 
 **(制約)**
 * Jenkinsfile Runnerは内部的にコンテナを使用するため、Dockerが動作可能な環境が必要
+* plugInに対応できていない
 * Jenkinsサーバー依存の設定やリソースはRunner環境に完全移行できない
   * 認証情報やシークレット管理は追加設定が必要。
 * Jenkinsの本番環境と動作が異なるケースがある
@@ -234,3 +236,22 @@ pipeline {
 ```sh
 docker pull jenkins/jenkinsfile-runner
 ```
+
+
+#### jpi拡張子のWarningが表示される場合の対処方法
+
+```
+WARNING hudson.ClassicPluginStrategy#createPluginWrapper: encountered /usr/share/jenkins/ref/plugins/cloudbees-folder.hpi under a nonstandard name; expected cloudbees-folder.jpi
+```
+
+このエラーメッセージは、Jenkinsfile Runnerがプラグインファイルの拡張子を
+予期している形式（.jpi）と異なる形式（.hpi）で検出したことを警告しています。
+.hpiと.jpiは基本的に同じ形式のファイルですが、
+Jenkinsの新しいバージョンでは.jpiを標準として採用しています。
+
+このエラーが発生しても機能的には問題なく動作する場合がありますが、以下の解決策で警告を修正できます。
+
+**解決方法**
+
+動作に問題なければ無視でも大丈夫です
+

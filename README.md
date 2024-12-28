@@ -64,3 +64,39 @@ act v
   * (デメリット)
     * Node.js以外の言語やツールを使用するアクションは動作しない。
     * 機能が非常に制限されている。
+
+## Jenkins
+
+### How To Use
+
+#### ローカルで実行する方法
+
+**コンテナをビルドする**
+```sh
+docker-compose -f docker-compose.jenkins.yaml build
+```
+
+**コンテナを起動する**
+```sh
+docker-compose -f docker-compose.jenkins.yaml up
+```
+
+
+```sh
+JENKINSFILE_PATH=$(pwd)/jenkins/pipelines/example2/Jenkinsfile docker-compose -f docker-compose -f docker-compose.jenkins.yaml up 
+```
+
+windowsの場合
+
+```bat
+set JENKINSFILE_PATH=%cd%\jenkins\pipelines\example2\Jenkinsfile
+docker-compose -f docker-compose.jenkins.yaml up 
+```
+
+
+**コンテナを終了するする**
+```sh
+docker-compose -f docker-compose.jenkins.yaml down
+```
+
+
