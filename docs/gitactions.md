@@ -1,6 +1,6 @@
 ## Git Actionの活用方法
 
-https://appj.pglikers.com/knowledge/protect.knowledge/view_edit/44
+https://appj.pglikers.com/knowledge/open.knowledge/view/44?offset=0
 
 - [Git Actionの活用方法](#git-actionの活用方法)
   - [実際にワークフローをコーディングしてみる!!](#実際にワークフローをコーディングしてみる)
@@ -52,8 +52,7 @@ mkdir -p .github/workflows
 * スケジュール実行の確認:
   * 実行履歴は GitHub Actions のワークフローページから確認可能です。
 
-ローカルで試す方法:
-
+ローカルで試す方法:actライブラリを利用する
 
 ---
 
@@ -567,7 +566,6 @@ jobs:
 ### ローカル環境でGit Actionを実行する
 
 #### Actツール
-
 
 * GitHub Actionsワークフローをローカルで実行できるツール。
 * GitHub Actionsの .github/workflows ファイルをそのまま使用可能。
