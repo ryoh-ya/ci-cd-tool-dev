@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  jenkinsfile-runner:
+    build:
+      context: jenkins
+    volumes:
+      - ${JENKINSFILE_PATH:-./jenkins/pipelines/example/Jenkinsfile}:/workspace/Jenkinsfile:ro
+    stdin_open: true
+    tty: true
