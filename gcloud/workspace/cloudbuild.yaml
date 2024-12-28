@@ -1,0 +1,3 @@
+steps:
+  - name: "alpine" # シンプルなLinuxベースのコンテナを使用
+    args: ["echo", "Hello, Cloud Build!"]

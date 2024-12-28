@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  gcloud:
+    build:
+      context: gcloud
+      dockerfile: Dockerfile
+    volumes:
+      # ローカルの gcloud 認証情報をコンテナに渡す
+      - ~/.config/gcloud:/root/.config/gcloud
+      # 現在のディレクトリをコンテナにマウント（プロジェクト用）
+      - ./gcloud/workspace:/workspace
+      # Docker ソケットを共有して、Docker を利用可能にする
+      - /var/run/docker.sock:/var/run/docker.sock
+    stdin_open: true
+    tty: true
