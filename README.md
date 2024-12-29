@@ -1,5 +1,18 @@
 ## CI/CD 開発
 
+- [CI/CD 開発](#cicd-開発)
+- [Git Actions](#git-actions)
+  - [How To Use](#how-to-use)
+    - [ローカルで実行する方法](#ローカルで実行する方法)
+  - [実行時のactイメージについての選択](#実行時のactイメージについての選択)
+- [Jenkins](#jenkins)
+  - [How To Use](#how-to-use-1)
+    - [ローカルで実行する方法](#ローカルで実行する方法-1)
+- [Google Cloud Build](#google-cloud-build)
+  - [How To Use](#how-to-use-2)
+    - [ローカルで実行する方法](#ローカルで実行する方法-2)
+
+
 ## Git Actions
 
 ### How To Use
@@ -94,9 +107,13 @@ docker-compose -f docker-compose.jenkins.yaml up
 ```
 
 
-**コンテナを終了するする**
+**コンテナを終了する**
 ```sh
 docker-compose -f docker-compose.jenkins.yaml down
+```
+
+```sh
+docker-compose -f docker-compose.jenkins.yaml run --rm --entrypoint sh jenkinsfile-runner
 ```
 
 

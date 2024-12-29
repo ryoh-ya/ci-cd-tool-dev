@@ -15,6 +15,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
       - [Host側にPython環境を使用する場合](#host側にpython環境を使用する場合)
       - [Dockerで一時的なPython環境を作成する方法](#dockerで一時的なpython環境を作成する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
+      - [jenkins/jenkins:lts](#jenkinsjenkinslts)
       - [Jenkinsfile Runner](#jenkinsfile-runner)
       - [jpi拡張子のWarningが表示される場合の対処方法](#jpi拡張子のwarningが表示される場合の対処方法)
 
@@ -202,12 +203,38 @@ pipeline {
 * Jenkinsの公式イメージがありますのでローカルで確認できます
 * Jenkinsfile Runnerにより軽微にpipelineの検証ができます
 
+* jenkins/jenkins:lts
+  * フル機能のJenkins
+  * 完全なJenkins インスタンスが起動するため、すべてのJenkins機能を利用可能
+  * Jenkins GUI を無効化 → --httpPort=-1 を使用して GUI を停止
+* Jenkinsfile Runner
+  * 軽量で高速: Jenkinsfile をテストする目的で最適化されている
+  * 完全な Jenkins インスタンスを起動せずに Pipeline の動作確認ができます。
+  * Docker、pluginなどの機能が制限される
+
+
+https://github.com/jenkinsci/docker/blob/master/README.md#plugin-installation-manager-cli
+
+
+#### jenkins/jenkins:lts
+
+
+
 #### Jenkinsfile Runner
+
+jenkinsfile-runner を効果的に使うには、
+Dockerfile を利用して必要なツール(Nodeなど)や依存ライブラリを
+事前にイメージに組み込むことをお勧めします
 
 * Jenkinsのパイプラインスクリプト（Jenkinsfile）をローカル環境で実行できるツール。
 * Jenkinsをフルにセットアップせずに、Jenkinsfileをテスト可能。
 * Jenkinsfileのステージやステップを、軽量なコンテナ環境で再現。
 * Jenkinsパイプラインの学習・デバッグに最適。
+
+**(制限)**
+* agent { docker { ... } } のような Docker を直接利用する構文（Docker エージェントプラグインに依存する部分）はサポートされていません
+* plugInなど拡張機能等も使えない
+
 
 
 **(用途)**
@@ -255,3 +282,17 @@ Jenkinsの新しいバージョンでは.jpiを標準として採用していま
 
 動作に問題なければ無視でも大丈夫です
 
+
+
+
+<!-- https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
+
+
+# jenkins-plugin-cliのダウンロード
+RUN curl -fsSL -o /usr/share/jenkins/jenkins-plugin-manager-cli.jar \
+    https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
+  
+
+  RUN java -jar /usr/share/jenkins/jenkins-plugin-manager-cli.jar \
+    --plugin-file /usr/share/jenkins/plugins.txt \
+    --plugin-download-directory /usr/share/jenkins/ref/plugins -->
