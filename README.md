@@ -14,8 +14,6 @@
   - [Google Cloud Build](#google-cloud-build)
     - [How To Use](#how-to-use-2)
       - [ローカルで実行する方法](#ローカルで実行する方法-2)
-- [/var/run/docker.sock のグループを docker に変更](#varrundockersock-のグループを-docker-に変更)
-- [グループに書き込み権限を付与](#グループに書き込み権限を付与)
 
 
 ## Git Actions
@@ -271,34 +269,3 @@ cloud-build-local の一部の機能を無効化することで、
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false --experimental_local .
 ```
-
-
-
-
-
-
-
-
-
-
-jenkins-cli groovy = < scripts/create-pipeline.groovy example-docker-pipeline /var/jenkins_home/pipelines/docker_Jenkinsfile
-jenkins-cli build example-docker-pipeline
-jenkins-cli console example-docker-pipeline
-
-
-
-jenkins-cli install-plugin workflow-job
-jenkins-cli install-plugin workflow-cps
-
-jenkins-cli safe-restart
-
-
-#!/bin/bash
-
-# /var/run/docker.sock のグループを docker に変更
-chown root:docker /var/run/docker.sock
-
-# グループに書き込み権限を付与
-chmod 660 /var/run/docker.sock
-
-exec "$@"
