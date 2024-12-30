@@ -1,19 +1,13 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18-alpine' // 使用する Docker イメージ
+        }
+    }
     stages {
-        stage('Build2') {
+        stage('Build') {
             steps {
-                echo 'Building2...'
-            }
-        }
-        stage('Test2') {
-            steps {
-                echo 'Testing2...'
-            }
-        }
-        stage('Deploy2') {
-            steps {
-                echo 'Deploying2...'
+                sh 'node -v' // Node.js のバージョン確認
             }
         }
     }
