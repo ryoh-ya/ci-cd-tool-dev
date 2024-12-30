@@ -91,31 +91,69 @@ docker-compose -f docker-compose.jenkins.yaml build
 
 **コンテナを起動する**
 ```sh
-docker-compose -f docker-compose.jenkins.yaml up
+docker-compose -f docker-compose.jenkins.yaml up -d
 ```
 
+**コンテナの中にはいる**
+```sh
+docker-compose -f docker-compose.jenkins.yaml exec -it jenkins-dev bash
+```
+
+
+### コンテナ後の環境設定
+
+**APIトークンを取得する**
 
 ```sh
-JENKINSFILE_PATH=$(pwd)/jenkins/pipelines/example2/Jenkinsfile docker-compose -f docker-compose -f docker-compose.jenkins.yaml up 
+java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ \
+-auth admin:admin123 \
 ```
 
-windowsの場合
-
-```bat
-set JENKINSFILE_PATH=%cd%\jenkins\pipelines\example2\Jenkinsfile
-docker-compose -f docker-compose.jenkins.yaml up 
-```
-
-
-**コンテナを終了する**
-```sh
-docker-compose -f docker-compose.jenkins.yaml down
-```
+### 環境変数の設定を行う
 
 ```sh
-docker-compose -f docker-compose.jenkins.yaml run --rm --entrypoint sh jenkinsfile-runner
+source .env.setup 
 ```
 
+上記を実行することにより
+`java -jar /var/jenkins_home/jenkins-cli.jar -s $JENKINS_URL -auth $JENKINS_AUTH`のエリアスが設定されて`jenkins-cli`が使えるようになる
+
+
+### CLIコマンド
+
+**ヘルプを表示する**
+```sh
+jenkins-cli help
+```
+
+**ジョブ一覧を取得する**
+```sh
+jenkins-cli list-jobs
+```
+
+**ジョブの詳細情報を取得する**
+```sh
+jenkins-cli get-job <JOB_NAME>
+# jenkins-cli get-job example-job
+```
+
+**ジョブをビルド(実行)する**
+```sh
+jenkins-cli build <JOB_NAME>
+```
+
+**ビルド結果を取得する**
+* ジョブの最新のビルドログを表示します。
+```sh
+jenkins-cli console <JOB_NAME>
+# or
+jenkins-cli console <JOB_NAME> <ビルド番号>
+```
+
+**プラグインをインストールする**
+```sh
+jenkins-cli build install-plugin <プラグイン名>
+```
 
 ---
 
@@ -228,3 +266,34 @@ cloud-build-local の一部の機能を無効化することで、
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false --experimental_local .
 ```
+
+
+
+
+
+
+
+
+
+
+jenkins-cli groovy = < scripts/create-pipeline.groovy example-docker-pipeline /var/jenkins_home/pipelines/docker_Jenkinsfile
+jenkins-cli build example-docker-pipeline
+jenkins-cli console example-docker-pipeline
+
+
+
+jenkins-cli install-plugin workflow-job
+jenkins-cli install-plugin workflow-cps
+
+jenkins-cli safe-restart
+
+
+#!/bin/bash
+
+# /var/run/docker.sock のグループを docker に変更
+chown root:docker /var/run/docker.sock
+
+# グループに書き込み権限を付与
+chmod 660 /var/run/docker.sock
+
+exec "$@"

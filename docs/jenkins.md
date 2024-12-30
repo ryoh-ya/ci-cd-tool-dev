@@ -16,6 +16,9 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
       - [Dockerで一時的なPython環境を作成する方法](#dockerで一時的なpython環境を作成する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
       - [jenkins/jenkins:lts](#jenkinsjenkinslts)
+        - [環境変数の設定を行う](#環境変数の設定を行う)
+        - [CLIコマンド](#cliコマンド)
+        - [JOBの作成方法](#jobの作成方法)
       - [Jenkinsfile Runner](#jenkinsfile-runner)
       - [jpi拡張子のWarningが表示される場合の対処方法](#jpi拡張子のwarningが表示される場合の対処方法)
 
@@ -113,8 +116,20 @@ pipeline {
 agent { label 'docker' } // Dockerノードで実行する
 ```
 
+Dockerのイメージで実行する場合
+
+```groovy
+agent { 
+    docker {
+        image 'node:18-alpine' // 使用する Docker イメージ
+    }
+  } // Dockerノードで実行する
+```
+
+
 Node内でDockerを使用する場合、
 HostマシンにDockerがインストールされている必要があります。
+
 
 
 
@@ -219,6 +234,93 @@ https://github.com/jenkinsci/docker/blob/master/README.md#plugin-installation-ma
 #### jenkins/jenkins:lts
 
 
+jenkins-cli.jarはJenkinsのWebサーバーから提供される
+
+jenkins-cli.jarはJenkins自体が提供するツールであり、Jenkinsサーバーのバージョンに合わせたCLIが`http://<JenkinsのURL>/jnlpJars/jenkins-cli.jar`からダウンロード可能です。
+
+```sh
+curl -o jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
+```
+
+* インストール時に実行されるスクリプト(init.groovy.d)
+  * ユーザー作成
+  * APIトークンを取得
+  * [setup.groovy](../jenkins/init.groovy.d/setup.groovy)
+
+
+##### 環境変数の設定を行う
+
+```sh
+source .env.setup 
+```
+
+上記を実行することにより
+`java -jar /var/jenkins_home/jenkins-cli.jar -s $JENKINS_URL -auth $JENKINS_AUTH`のエリアスが設定されて`jenkins-cli`が使えるようになる
+
+
+##### CLIコマンド
+
+**ヘルプを表示する**
+```sh
+jenkins-cli help
+```
+
+**ジョブ一覧を取得する**
+```sh
+jenkins-cli list-jobs
+```
+
+**ジョブの詳細情報を取得する**
+```sh
+jenkins-cli get-job <JOB_NAME>
+# jenkins-cli get-job example-job
+```
+
+**ジョブをビルド(実行)する**
+```sh
+jenkins-cli build <JOB_NAME>
+```
+
+**ビルド結果を取得する**
+* ジョブの最新のビルドログを表示します。
+```sh
+jenkins-cli console <JOB_NAME>
+# or
+jenkins-cli console <JOB_NAME> <ビルド番号>
+```
+
+**ジョブを削除する**
+```sh
+jenkins-cli delete-job <JOB_NAME>
+```
+
+
+**プラグインをインストールする**
+```sh
+jenkins-cli build install-plugin <プラグイン名>
+```
+
+
+##### JOBの作成方法
+
+**(groovyスクリプト)**
+```sh
+jenkins-cli groovy = < scripts/create-pipline-examole.groovy
+```
+
+**(config.xml形式)**
+```sh
+jenkins-cli create-job example-xml-job < scripts/job-config.xml
+```
+
+**(Jenkinsfileから実行/groovyスクリプトを自作)**
+```sh
+jenkins-cli groovy = < scripts/create-pipeline.groovy <ジョブ名> <pipefile>
+# jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
+```
+
+
+
 
 #### Jenkinsfile Runner
 
@@ -282,17 +384,5 @@ Jenkinsの新しいバージョンでは.jpiを標準として採用していま
 
 動作に問題なければ無視でも大丈夫です
 
+---
 
-
-
-<!-- https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
-
-
-# jenkins-plugin-cliのダウンロード
-RUN curl -fsSL -o /usr/share/jenkins/jenkins-plugin-manager-cli.jar \
-    https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
-  
-
-  RUN java -jar /usr/share/jenkins/jenkins-plugin-manager-cli.jar \
-    --plugin-file /usr/share/jenkins/plugins.txt \
-    --plugin-download-directory /usr/share/jenkins/ref/plugins -->

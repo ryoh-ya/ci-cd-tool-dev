@@ -8,8 +8,13 @@ services:
     tty: true
     volumes:
       - ./jenkins/scripts:/var/jenkins_home/scripts
+      - ./jenkins/pipelines:/var/jenkins_home/pipelines
+      - /var/run/docker.sock:/var/run/docker.sock  # Dockerデーモンをコンテナ内で利用可能に
     ports:
       - "8080:8080" # ホストの8080ポートをコンテナの8080ポートにマッピング
       - "50000:50000" # エージェント用ポート (必要に応じて)
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false # セットアップウィザードをスキップ
+      - JENKINS_USER=admin
+      - JENKINS_PASS=admin123
+      - JENKINS_URL=http://localhost:8080
