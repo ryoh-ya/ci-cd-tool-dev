@@ -6,10 +6,10 @@ import org.jenkinsci.plugins.workflow.cps.*
 def jenkins = Jenkins.getInstance()
 
 // ジョブ名を指定
-def jobName = "example-pipeline"
+def jobName = this.args[0]
 
 // Pipelineスクリプトのパスを指定
-def pipelineScriptPath = "/var/jenkins_home/pipelines/Jenkinsfile"
+def pipelineScriptPath = this.args[1]
 
 // ジョブが存在しない場合に作成
 if (jenkins.getItem(jobName) == null) {
