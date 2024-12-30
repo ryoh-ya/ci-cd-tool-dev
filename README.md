@@ -1,16 +1,21 @@
-## CI/CD 開発
+# CI/CD 開発用リポジトリ
 
-- [CI/CD 開発](#cicd-開発)
-- [Git Actions](#git-actions)
-  - [How To Use](#how-to-use)
-    - [ローカルで実行する方法](#ローカルで実行する方法)
-  - [実行時のactイメージについての選択](#実行時のactイメージについての選択)
-- [Jenkins](#jenkins)
-  - [How To Use](#how-to-use-1)
-    - [ローカルで実行する方法](#ローカルで実行する方法-1)
-- [Google Cloud Build](#google-cloud-build)
-  - [How To Use](#how-to-use-2)
-    - [ローカルで実行する方法](#ローカルで実行する方法-2)
+- [CI/CD 開発用リポジトリ](#cicd-開発用リポジトリ)
+  - [Git Actions](#git-actions)
+    - [How To Use](#how-to-use)
+      - [ローカルで実行する方法](#ローカルで実行する方法)
+    - [実行時のactイメージについての選択](#実行時のactイメージについての選択)
+  - [Jenkins](#jenkins)
+    - [How To Use](#how-to-use-1)
+      - [ローカルで実行する方法](#ローカルで実行する方法-1)
+    - [コンテナ後の環境設定](#コンテナ後の環境設定)
+    - [環境変数の設定を行う](#環境変数の設定を行う)
+    - [CLIコマンド](#cliコマンド)
+  - [Google Cloud Build](#google-cloud-build)
+    - [How To Use](#how-to-use-2)
+      - [ローカルで実行する方法](#ローカルで実行する方法-2)
+- [/var/run/docker.sock のグループを docker に変更](#varrundockersock-のグループを-docker-に変更)
+- [グループに書き込み権限を付与](#グループに書き込み権限を付与)
 
 
 ## Git Actions
