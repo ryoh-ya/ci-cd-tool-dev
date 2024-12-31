@@ -8,3 +8,4 @@ python_project/README.md
 coverage_table.md
 pytest-coverage.txt
 pytest.xml
+.pytest_cache

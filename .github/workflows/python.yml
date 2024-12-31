@@ -1,9 +1,7 @@
 name: Python Debug
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 jobs:
   python-debug:
     runs-on: ubuntu-latest
