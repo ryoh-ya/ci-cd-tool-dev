@@ -18,7 +18,7 @@ class GenerateCoverage:
         """
         coverage.txt のデータを解析してカバレッジ情報を抽出
         """
-        with open(self.coverage_file, "r", encoding="utf-16") as f:
+        with open(self.coverage_file, "r") as f:
             lines = f.readlines()
 
         coverage_info = []

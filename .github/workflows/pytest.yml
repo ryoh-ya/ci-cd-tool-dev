@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         id: installDependencies
         run: |
-          pip install -r /github/workspace/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run Python Test
         id: runPyTest
@@ -32,17 +32,28 @@ jobs:
           coverage-badge -o coverage.svg
           python - <<EOF
           from src.lib.generate_coverage import GenerateCoverage
-          generate_coverage = GenerateCoverage("tests/pytest-coverage.txt", "tests/table.md")
+          generate_coverage = GenerateCoverage()
           generate_coverage.save_table()
           EOF
 
       - name: Update Readme
         id: updateReadme
         run: |
-          echo "# Pytest Report" > /github/workspace/Readme.md
-          echo "![test](coverage.svg)" >> /github/workspace/Readme.md
-          cat tests/table.md >> /github/workspace/Readme.md
-          cat /github/workspace/Readme.md
+          echo "# Pytest Report" > README.md
+          echo "![test](coverage.svg)" >> README.md
+          cat tests/table.md >> README.md
+          cat README.md
+
+      - name: Check files before upload
+        run: ls -l README.md coverage.svg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ret-artifact
+          path: |
+            README.md
+            coverage.svg
 
       # - name: Update Readme for Coverage Report
       #   run: |

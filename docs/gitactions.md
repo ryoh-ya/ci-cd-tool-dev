@@ -23,6 +23,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/44?offset=0
   - [Pythonコードを実行する方法](#pythonコードを実行する方法)
   - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
   - [ローカル環境でGit Actionを実行する](#ローカル環境でgit-actionを実行する)
+  - [Pytestを実行する方法](#pytestを実行する方法)
 
 
 **ワークフローをGUIから作成する方法**
@@ -411,3 +412,8 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/441
 ### ローカル環境でGit Actionを実行する
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/440
+
+### Pytestを実行する方法
+
+* https://appj.pglikers.com/knowledge/open.knowledge/view/443
+  

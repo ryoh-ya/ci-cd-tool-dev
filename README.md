@@ -40,6 +40,10 @@ docker exec -it act-container /bin/bash
 **actでワークフローを実行**
 ```sh
 act
+# ディレクトリを指定する
+act -W path/to/your/custom/folder
+# ymlを指定する方法
+act -j python-debug
 ```
 
 pushイベントを実行したい場合
@@ -269,3 +273,5 @@ cloud-build-local の一部の機能を無効化することで、
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false --experimental_local .
 ```
+
+

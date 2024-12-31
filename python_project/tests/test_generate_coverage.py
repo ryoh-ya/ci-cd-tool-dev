@@ -4,7 +4,7 @@ from lib.generate_coverage import GenerateCoverage
 
 @pytest.fixture
 def generate_coverage():
-    return GenerateCoverage("tests/pytest-coverage.txt", "tests/table.md")
+    return GenerateCoverage("tests/sample.txt", "tests/table.md")
 
 
 def test_print_coverage(generate_coverage):
