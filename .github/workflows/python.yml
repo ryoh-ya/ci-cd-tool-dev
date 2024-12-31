@@ -1,0 +1,43 @@
+name: Python Debug
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  python-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run Python script
+        run: |
+          python - <<EOF
+          import requests
+
+          url = "https://example.com"
+          response = requests.get(url)
+
+          if response.status_code == 200:
+              # print("API call succeeded:", response.json())
+              print("API call succeeded:")
+          else:
+              print("API call failed with status code:", response.status_code)
+              raise Exception("API call failed")
+
+          EOF
+
+      - name: script exec
+        working-directory: ./src
+        run: python main.py

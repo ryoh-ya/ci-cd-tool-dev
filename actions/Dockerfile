@@ -18,7 +18,7 @@ RUN curl -L -o /tmp/act.tar.gz https://github.com/nektos/act/releases/download/v
     rm /tmp/act.tar.gz
 
 # デフォルトの作業ディレクトリを設定
-WORKDIR /workspace
+WORKDIR /github/workspace
 RUN git init
 RUN touch README.md
 RUN git add .

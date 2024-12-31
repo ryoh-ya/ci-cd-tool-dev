@@ -1,1 +1,6 @@
 .env
+__pycache__
+python_project/.coverage
+python_project/coverage.svg
+python_project/pytest-coverage.txt
+python_project/pytest.xml
