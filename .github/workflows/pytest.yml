@@ -25,7 +25,7 @@ jobs:
           pytest --junitxml=pytest.xml --cov-report term-missing --cov=src tests/ | tee pytest-coverage.txt
 
       - name: Coverage Report
-        id: runPyTest
+        id: CoverageReport
         run: |
           coverage-badge -o coverage.svg
           python - <<EOF
@@ -38,7 +38,9 @@ jobs:
         id: updateReadme
         run: |
           echo "# Pytest Report" > README.md
+          echo "" >> README.md
           echo "![test](coverage.svg)" >> README.md
+          echo "" >> README.md
           cat tests/table.md >> README.md
           cat README.md
 
