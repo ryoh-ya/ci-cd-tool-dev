@@ -215,6 +215,7 @@ gcloud config set project [PROJECT_ID]
 **ローカルでcloud buildをテスト**
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false .
+# cloud-build-local --config=gcloud/debug.cloudbuild.yaml --dryrun=false .
 ```
 
 
