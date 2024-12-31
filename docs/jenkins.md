@@ -15,6 +15,10 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
       - [Host側にPython環境を使用する場合](#host側にpython環境を使用する場合)
       - [Dockerで一時的なPython環境を作成する方法](#dockerで一時的なpython環境を作成する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
+      - [jenkins/jenkins:lts](#jenkinsjenkinslts)
+        - [環境変数の設定を行う](#環境変数の設定を行う)
+        - [CLIコマンド](#cliコマンド)
+        - [JOBの作成方法](#jobの作成方法)
       - [Jenkinsfile Runner](#jenkinsfile-runner)
       - [jpi拡張子のWarningが表示される場合の対処方法](#jpi拡張子のwarningが表示される場合の対処方法)
 
@@ -112,8 +116,20 @@ pipeline {
 agent { label 'docker' } // Dockerノードで実行する
 ```
 
+Dockerのイメージで実行する場合
+
+```groovy
+agent { 
+    docker {
+        image 'node:18-alpine' // 使用する Docker イメージ
+    }
+  } // Dockerノードで実行する
+```
+
+
 Node内でDockerを使用する場合、
 HostマシンにDockerがインストールされている必要があります。
+
 
 
 
@@ -202,12 +218,125 @@ pipeline {
 * Jenkinsの公式イメージがありますのでローカルで確認できます
 * Jenkinsfile Runnerにより軽微にpipelineの検証ができます
 
+* jenkins/jenkins:lts
+  * フル機能のJenkins
+  * 完全なJenkins インスタンスが起動するため、すべてのJenkins機能を利用可能
+  * Jenkins GUI を無効化 → --httpPort=-1 を使用して GUI を停止
+* Jenkinsfile Runner
+  * 軽量で高速: Jenkinsfile をテストする目的で最適化されている
+  * 完全な Jenkins インスタンスを起動せずに Pipeline の動作確認ができます。
+  * Docker、pluginなどの機能が制限される
+
+
+https://github.com/jenkinsci/docker/blob/master/README.md#plugin-installation-manager-cli
+
+
+#### jenkins/jenkins:lts
+
+
+jenkins-cli.jarはJenkinsのWebサーバーから提供される
+
+jenkins-cli.jarはJenkins自体が提供するツールであり、Jenkinsサーバーのバージョンに合わせたCLIが`http://<JenkinsのURL>/jnlpJars/jenkins-cli.jar`からダウンロード可能です。
+
+```sh
+curl -o jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
+```
+
+* インストール時に実行されるスクリプト(init.groovy.d)
+  * ユーザー作成
+  * APIトークンを取得
+  * [setup.groovy](../jenkins/init.groovy.d/setup.groovy)
+
+
+##### 環境変数の設定を行う
+
+```sh
+source .env.setup 
+```
+
+上記を実行することにより
+`java -jar /var/jenkins_home/jenkins-cli.jar -s $JENKINS_URL -auth $JENKINS_AUTH`のエリアスが設定されて`jenkins-cli`が使えるようになる
+
+
+##### CLIコマンド
+
+**ヘルプを表示する**
+```sh
+jenkins-cli help
+```
+
+**ジョブ一覧を取得する**
+```sh
+jenkins-cli list-jobs
+```
+
+**ジョブの詳細情報を取得する**
+```sh
+jenkins-cli get-job <JOB_NAME>
+# jenkins-cli get-job example-job
+```
+
+**ジョブをビルド(実行)する**
+```sh
+jenkins-cli build <JOB_NAME>
+```
+
+**ビルド結果を取得する**
+* ジョブの最新のビルドログを表示します。
+```sh
+jenkins-cli console <JOB_NAME>
+# or
+jenkins-cli console <JOB_NAME> <ビルド番号>
+```
+
+**ジョブを削除する**
+```sh
+jenkins-cli delete-job <JOB_NAME>
+```
+
+
+**プラグインをインストールする**
+```sh
+jenkins-cli build install-plugin <プラグイン名>
+```
+
+
+##### JOBの作成方法
+
+**(groovyスクリプト)**
+```sh
+jenkins-cli groovy = < scripts/create-pipline-examole.groovy
+```
+
+**(config.xml形式)**
+```sh
+jenkins-cli create-job example-xml-job < scripts/job-config.xml
+```
+
+**(Jenkinsfileから実行/groovyスクリプトを自作)**
+```sh
+jenkins-cli groovy = < scripts/create-pipeline.groovy <ジョブ名> <pipefile>
+# jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
+```
+
+
+
+
 #### Jenkinsfile Runner
+
+jenkinsfile-runner を効果的に使うには、
+Dockerfile を利用して必要なツール(Nodeなど)や依存ライブラリを
+事前にイメージに組み込むことをお勧めします
 
 * Jenkinsのパイプラインスクリプト（Jenkinsfile）をローカル環境で実行できるツール。
 * Jenkinsをフルにセットアップせずに、Jenkinsfileをテスト可能。
 * Jenkinsfileのステージやステップを、軽量なコンテナ環境で再現。
 * Jenkinsパイプラインの学習・デバッグに最適。
+
+**(制限)**
+* agent { docker { ... } } のような Docker を直接利用する構文（Docker エージェントプラグインに依存する部分）はサポートされていません
+* plugInなど拡張機能等も使えない
+
 
 
 **(用途)**
@@ -254,4 +383,6 @@ Jenkinsの新しいバージョンでは.jpiを標準として採用していま
 **解決方法**
 
 動作に問題なければ無視でも大丈夫です
+
+---
 

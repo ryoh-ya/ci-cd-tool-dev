@@ -21,25 +21,19 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/44?offset=0
   - [変数の設定](#変数の設定)
     - [GitHub Secretsを使った環境変数の管理](#github-secretsを使った環境変数の管理)
   - [Pythonコードを実行する方法](#pythonコードを実行する方法)
-    - [Pythonファイルを実行する](#pythonファイルを実行する)
-    - [Pythonスクリプトを直接記述](#pythonスクリプトを直接記述)
   - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
-    - [GitHubのデフォルト通知設定を利用する](#githubのデフォルト通知設定を利用する)
-    - [特定のメールアドレスに送信](#特定のメールアドレスに送信)
-      - [mailxコマンドで直接メール送信](#mailxコマンドで直接メール送信)
-      - [Slackや他の通知方法](#slackや他の通知方法)
   - [ローカル環境でGit Actionを実行する](#ローカル環境でgit-actionを実行する)
-    - [Actツール](#actツール)
-      - [使い方](#使い方)
+  - [Pytestを実行する方法](#pytestを実行する方法)
 
 
-ワークフローをGUIから作成する方法
+**ワークフローをGUIから作成する方法**
 
 1. Githubの画面を開く
 2. repositoryを選択し"Actions"を押下する
 3. ワークフローの定義をする
 
-リポジトリのソースに記載する場合のフォルダ
+**リポジトリのソースに記載する場合のフォルダ**
+
 ```
 mkdir -p .github/workflows
 ```
@@ -85,7 +79,6 @@ jobs:
 
 **jobについて**
 
-
 * job1: ジョブ名で、ユーザーが自由に設定
   * name: ジョブに対する分かりやすい名前（UIに表示される名前）
   * runs-on: このジョブがどの環境で実行されるかを指定します
@@ -110,7 +103,6 @@ jobs:
 ```
 on: [push, fork]
 ```
-
 
 ---
 
@@ -141,7 +133,6 @@ on: [push, fork]
     - PythonやNode.js、Java、Ruby、Go、PHP、.NET、Rustなどの主要なプログラミング言語
     - DockerおよびDocker Composeが利用可能。
     - Git, Curl, Wget, SSHなど一般的な開発ツールもインストール済み
-
 
 #### セルフホストランナー
 
@@ -205,6 +196,7 @@ steps:
   - 一般的な開発ツールもインストール済み。
 
 #### 必要に応じてセットアップ
+
 特定の言語やバージョンを利用する場合、以下のように設定できます。
 
 - Pythonの特定バージョン:
@@ -411,218 +403,17 @@ jobs:
 
 ### Pythonコードを実行する方法
 
-#### Pythonファイルを実行する
-
-Pythonスクリプト（例: script.py）を用意し、
-GitHub Actionsで実行します。
-
-* script.py (リポジトリに用意するファイル)
-
-```yaml
-jobs:
-  run-python-script:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
-
-      - name: Run Python script
-        run: python script.py
-```
-
-./srcディレクトリを基準に実行する場合
-
-```yaml
-     # 4. src ディレクトリを基準に Python ファイルを実行
-      - name: Run Python script
-        working-directory: ./src
-        run: python main.py
-```
-または
-```yaml
-- name: Set PYTHONPATH
-  run: |
-    export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-    python src/main.py```
-```
-
-
-#### Pythonスクリプトを直接記述
-
-Pythonスクリプトをファイルにせず、YAML内で直接記述することも可能です。
-
-```yaml
-    steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
-
-      - name: Run Python script
-        run: |
-          python - <<EOF
-          import requests
-
-          url = "https://example.com/api/v1/data"
-          response = requests.get(url)
-
-          if response.status_code == 200:
-              print("API call succeeded:", response.json())
-          else:
-              print("API call failed with status code:", response.status_code)
-              raise Exception("API call failed")
-          EOF
-```
-
-
+https://appj.pglikers.com/knowledge/open.knowledge/view/439
 
 ### メール、Slack等に通知する方法
 
-#### GitHubのデフォルト通知設定を利用する
-
-GitHubではデフォルトで、ワークフローが失敗したときに
-リポジトリのウォッチャーや関係者に通知（メールやプッシュ通知）が送信されます。
-
-**手順**
-
-* リポジトリの右上にある「Watch」ボタンを押下する
-* 「Custom」から「Actions」の通知を有効にします。
-* GitHubのアカウント設定 → 通知設定 で、メール通知が有効になっているか確認します
-
-#### 特定のメールアドレスに送信
-
-mailx や外部サービス（例: SendGridやSlack）を利用します。
-
-##### mailxコマンドで直接メール送信
-
-失敗時に mailx を使ってメールを送る例です。
-事前にGitHub Actionsのランナー環境にメール送信設定を整える必要があります。
-
-```
-      - name: Run a script
-        run: |
-          echo "Running some task..."
-          exit 1 # 強制的に失敗させる
-
-      - name: Send email on failure
-        if: failure() # このステップは失敗時のみ実行
-        run: |
-          echo "Workflow failed!" | mailx -s "Workflow Failure" you@example.com
-```
-
-#####  Slackや他の通知方法
-
-GitHub ActionsにはSlackやWebhook通知のためのアクションが用意されています。
-
-例: Slack通知
-SlackのIncoming Webhooks を設定してWebhook URLを取得。
-リポジトリの Secrets に SLACK_WEBHOOK_URL を追加。
-
-```
-name: Notify on Failure
-
-on:
-  push:
-  schedule:
-    - cron: '0 0 * * *' # 定期実行
-
-jobs:
-  notify-failure:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run a script
-        run: |
-          echo "Running some task..."
-          exit 1 # 強制的に失敗させる
-
-      - name: Notify Slack on failure
-        if: failure() # このステップは失敗時のみ実行
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Workflow failed!"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-```
-
-----
+https://appj.pglikers.com/knowledge/open.knowledge/view/441
 
 ### ローカル環境でGit Actionを実行する
 
-#### Actツール
+https://appj.pglikers.com/knowledge/open.knowledge/view/440
 
-* GitHub Actionsワークフローをローカルで実行できるツール。
-* GitHub Actionsの .github/workflows ファイルをそのまま使用可能。
-* Dockerコンテナを使ってローカル環境でステップを再現。
-* GitHub Actionsを学習・テストするのに最適
+### Pytestを実行する方法
 
-**(用途)**
-* ローカルでworkflowをテストする
-  * プッシュせずに問題を修正できるため、時間とリソースを節約
-* リポジトリのWorkflowをローカルで実行
-  * 既存のリポジトリのWorkflowをトリガーイベントを指定してローカルで実行
-* GitActionsの学習
-
-**(制約)**
-* actは内部的にDockerを使用しているため、Dockerが動作可能な環境が必要
-* GitHub Actionsの完全な再現は難しい
-  * actに対応していない一部のActionsや機能（プラグインなど）がある
-    * actions/cache
-* GitHubリソースへの依存
-  * プライベートリポジトリやGitHub APIを利用するWorkflowでは、GITHUB_TOKENが必要になる
-
-
-**(手順)**
-1. Dockerファイルを作成する
-    * [Dockerfile](../actions/Dockerfile)
-
-
-**GITHUB_TOKENは必要か？**
-
-* 必要になるケース
-  * プライベートリポジトリを操作する場合
-    * actを使ってプライベートリポジトリのワークフローをテストするには、GITHUB_TOKENが必要です
-    * プライベートリポジトリにアクセスするにはGitHubのPersonal Access Token（PAT）が必要です。
-    * PATには少なくとも repo 権限が必要です。
-  * APIリクエスト制限を回避したい場合:
-    * actはGitHub APIを利用してリソースを取得しますが、未認証のリクエストは1時間あたりの制限（60リクエスト）があります
-    * GITHUB_TOKENを渡すと、認証済みとして扱われるため、APIリクエストの制限が緩和（5,000リクエスト/時間）されます
-
-
-* ワークフローのテスト対象がパブリックリポジトリの場合、GITHUB_TOKENは必須ではありません。
-* ローカルでの簡易テスト
-* ワークフローが外部リソース（GitHub APIやリポジトリデータなど）に依存していない場合、GITHUB_TOKENなしで動作します。
-
-##### 使い方
-
-**actでワークフローを実行**
-```sh
-act
-```
-
-pushイベントを実行したい場合
-
-```sh
-act push
-```
-
-デバッグ情報を含める場合
-```sh
-act v
-```
+* https://appj.pglikers.com/knowledge/open.knowledge/view/443
+  
