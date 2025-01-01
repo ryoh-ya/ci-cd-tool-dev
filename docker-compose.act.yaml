@@ -10,7 +10,7 @@ services:
       - ./python_project/tests:/workspace/tests  # testsソース
       - ./python_project/requirements.txt:/workspace/requirements.txt  # testsソース
       - ./actions/artifacts:/workspace/artifacts  # testsソース
-      - ./actions/.secrets:/workspace/.secrets  # testsソース
+      - ./.secrets:/workspace/.secrets  # testsソース
       - /var/run/docker.sock:/var/run/docker.sock  # Dockerデーモンをコンテナ内で利用可能に
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN}  # 環境変数でGitHubトークンを渡す

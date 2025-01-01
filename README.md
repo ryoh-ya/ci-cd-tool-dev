@@ -14,6 +14,7 @@
   - [Google Cloud Build](#google-cloud-build)
     - [How To Use](#how-to-use-2)
       - [ローカルで実行する方法](#ローカルで実行する方法-2)
+        - [セットアップ](#セットアップ)
 
 
 ## Git Actions
@@ -183,6 +184,14 @@ jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jen
 docker-compose -f docker-compose.gcloud.yaml build
 ```
 
+```sh
+docker-compose -f docker-compose.gcloud.yaml up -d
+```
+
+```sh
+docker-compose -f docker-compose.gcloud.yaml exec -it gcloud bash
+```
+
 **コンテナを起動して中に入る**
 ```sh
 docker-compose -f docker-compose.gcloud.yaml run gcloud
@@ -218,6 +227,22 @@ gcloud projects list
 ```sh
 gcloud config set project [PROJECT_ID]
 ```
+
+##### セットアップ
+
+.secrets.jsonを生成する
+
+```sh
+bash ./Maintenance/generate_secret_json.sh
+```
+
+.secrets.jsonを登録する
+
+```sh
+bash ./Maintenance/register_secret_manager.sh 
+```
+
+
 
 
 **ローカルでcloud buildをテスト**

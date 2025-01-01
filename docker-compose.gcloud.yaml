@@ -10,6 +10,8 @@ services:
       - ~/.config/gcloud:/root/.config/gcloud
       # 現在のディレクトリをコンテナにマウント（プロジェクト用）
       - ./gcloud/workspace:/workspace/gcloud
+      - ./gcloud/Maintenance:/workspace/Maintenance
+      - ./.secrets:/workspace/.secrets
       - ./python_project/src:/workspace/src
       - ./python_project/tests:/workspace/tests
       - ./python_project/requirements.txt:/workspace/requirements.txt
