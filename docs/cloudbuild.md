@@ -6,9 +6,11 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/447
   - [システム構成について](#システム構成について)
   - [ワークフローを作成する](#ワークフローを作成する)
   - [ワークフローを実行する](#ワークフローを実行する)
+  - [環境変数・Secret Managerの管理](#環境変数secret-managerの管理)
   - [Python/shellスクリプトを実行する](#pythonshellスクリプトを実行する)
   - [DockerイメージをビルドしてContainer Registryにプッシュする](#dockerイメージをビルドしてcontainer-registryにプッシュする)
   - [ローカルで実行する](#ローカルで実行する)
+  - [環境変数・Secret Managerの管理](#環境変数secret-managerの管理-1)
 
 
 CI/CDの実行ファイル
@@ -29,12 +31,13 @@ touch cloudbuild.yaml
   * アプリケーションのビルドプロセスを自動化（Node.js, Python, Go, Java など）。
   * ビルド成果物（バイナリやアーティファクト）を Google Cloud Storage に保存
 * プルリクエストやコード変更時にユニットテスト、統合テストを自動実行
-
 **他のCI/CDツールとの強み**
 
 * Google Cloudとの統合性
 * サーバーレスのため、自身でビルド環境をホストする必要がなく、スケーラビリティも高い
 * カスタムビルドステップ（Docker イメージとしての独自ツール）を作成して利用できる
+(不向きなもの)
+* GCEを使わないSSHによる接続の場合は向いていない。
 
 ### システム構成について
 
@@ -52,6 +55,7 @@ touch cloudbuild.yaml
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/450
 
+* ローカル版ではscriptセクションが使えない
 
 ### ワークフローを実行する
 
@@ -90,7 +94,6 @@ gcloud beta builds triggers run TRIGGER_ID \
     --branch=BRANCH_NAME
 ```
 
-
 ジョブ一覧を確認する
 
 ```sh
@@ -108,6 +111,11 @@ gcloud builds describe BUILD_ID
 ```sh
 gcloud builds log BUILD_ID
 ```
+### 環境変数・Secret Managerの管理
+
+* ローカル版ではSecret Manager、環境変数が上手く動作しない
+  * すべてがサブスティチューションと認識される(env、secretgが使えない)
+  * --substitutions で明示的に設定されていないとエラーになる
 
 
 ### Python/shellスクリプトを実行する 
@@ -125,3 +133,15 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/446?offset=0
 
 cloud-build-local を使ってローカルでビルドを実行する場合、
 scriptフィールドはサポートされていない可能性が高いです
+
+
+### 環境変数・Secret Managerの管理
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/461
+
+* ローカル版ではSecret Manager、環境変数が上手く動作しない
+  * すべてがサブスティチューションと認識される
+  * --substitutions で明示的に設定されていないとエラーになる
+
+secretマネージャの制御方法
+  * https://appj.pglikers.com/knowledge/open.knowledge/view/460
