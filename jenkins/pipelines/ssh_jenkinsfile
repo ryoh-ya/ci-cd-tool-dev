@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    environment {
+        REMOTE_HOST = '49.212.142.39' // 接続先のホスト
+    }
+    stages {
+        stage('setup') {
+            steps {
+                script {
+                    // SSH認証情報からユーザー名を取得して環境変数に設定
+                    withCredentials([sshUserPrivateKey(credentialsId: 'test-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        // 環境変数として設定
+                        env.SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@${env.REMOTE_HOST}"
+
+                        // SSH接続を実行
+                        sh '''
+                        $SSH_COMMAND "echo Connected to $(hostname)"
+                        '''                        
+                    }
+                }
+            }
+        }
+    }
+}
