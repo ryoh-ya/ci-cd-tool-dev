@@ -3,23 +3,17 @@
 https://appj.pglikers.com/knowledge/open.knowledge/view/44?offset=0
 
 - [Git Actionの活用方法](#git-actionの活用方法)
-  - [実際にワークフローをコーディングしてみる!!](#実際にワークフローをコーディングしてみる)
+  - [ワークフローのコーディングの基本!!](#ワークフローのコーディングの基本)
   - [イベントの基本について](#イベントの基本について)
   - [GitHub Actionsのジョブを実行する仮想環境について](#github-actionsのジョブを実行する仮想環境について)
   - [**1. `runs-on` に指定できるもの**](#1-runs-on-に指定できるもの)
     - [**GitHubホストランナー（プリセット環境）**](#githubホストランナープリセット環境)
     - [セルフホストランナー](#セルフホストランナー)
-    - [特定の言語やバージョンを利用する場合、以下のように設定できます。](#特定の言語やバージョンを利用する場合以下のように設定できます)
   - [**2. `ubuntu-latest` で使えるプリインストールツール**](#2-ubuntu-latest-で使えるプリインストールツール)
     - [プリインストールされている主なツール](#プリインストールされている主なツール)
-    - [必要に応じてセットアップ](#必要に応じてセットアップ)
-  - [Google Cloudを使う方法](#google-cloudを使う方法)
-    - [必要な準備](#必要な準備)
-  - [時間で指定する場合](#時間で指定する場合)
-  - [checkout ステップの動作](#checkout-ステップの動作)
-  - [sshの設定方法](#sshの設定方法)
-  - [変数の設定](#変数の設定)
-    - [GitHub Secretsを使った環境変数の管理](#github-secretsを使った環境変数の管理)
+  - [ワークフロー作成のTIPS](#ワークフロー作成のtips)
+  - [ssh接続で他サーバーを制御する](#ssh接続で他サーバーを制御する)
+  - [環境変数・GitHub Secretの管理](#環境変数github-secretの管理)
   - [Pythonコードを実行する方法](#pythonコードを実行する方法)
   - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
   - [ローカル環境でGit Actionを実行する](#ローカル環境でgit-actionを実行する)
@@ -50,7 +44,7 @@ mkdir -p .github/workflows
 
 ---
 
-### 実際にワークフローをコーディングしてみる!!
+### ワークフローのコーディングの基本!!
 
 developブランチにプッシュがあった場合をトリガーにする
 
@@ -146,28 +140,6 @@ runs-on: self-hosted
 セルフホストランナーを使うと、カスタムソフトウェアやリソースにアクセス可能です。
 サーバーのセットアップや管理が必要です。
 
-#### 特定の言語やバージョンを利用する場合、以下のように設定できます。
-
-Pythonの特定バージョン
-
-```yaml
-steps:
-  - name: Set up Python
-    uses: actions/setup-python@v4
-    with:
-      python-version: '3.11'
-```
-
-Node.jsの特定バージョン:
-
-```yaml
-steps:
-  - name: Set up Node.js
-    uses: actions/setup-node@v3
-    with:
-      node-version: '18'
-```
-
 ---
 
 ### **2. `ubuntu-latest` で使えるプリインストールツール**
@@ -195,211 +167,23 @@ steps:
 - **Git, Curl, Wget, SSH**:
   - 一般的な開発ツールもインストール済み。
 
-#### 必要に応じてセットアップ
 
-特定の言語やバージョンを利用する場合、以下のように設定できます。
+### ワークフロー作成のTIPS
 
-- Pythonの特定バージョン:
-  ```yaml
-  steps:
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-  ```
+https://appj.pglikers.com/knowledge/open.knowledge/view/459
 
-- Node.jsの特定バージョン:
-  ```yaml
-  steps:
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-  ```
+* 必要に応じてアプリをセットアップする
+* トリガーを時間で指定する場合(スケジューラ
+* checkoutステップの動作(ソース取得)
+* Google Cloudを使う方法
 
----
+### ssh接続で他サーバーを制御する
 
-### Google Cloudを使う方法
+https://appj.pglikers.com/knowledge/open.knowledge/view/458
 
-GitHub Actionsでは、Google Cloud（GCP）にデプロイや操作を行うことも可能です。
-以下の方法でセットアップします。
+### 環境変数・GitHub Secretの管理
 
-#### 必要な準備
-
-1. GCPサービスアカウント
-2. GitHub Secretsに登録:ダウンロードしたJSONキーをGitHub Secretsに登録（例: `GCP_CREDENTIALS`）。
-
-以下は、GitHub ActionsでGoogle Cloudにデプロイする例です。
-
-```yaml
-name: Deploy to Google Cloud
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: your-project-id
-          export_default_credentials: true
-
-      - name: Deploy to App Engine
-        run: |
-          gcloud app deploy app.yaml --quiet
-```
-
-* 主要なGoogle Cloud関連のアクション
-  * `google-github-actions/auth`
-    * GCPに認証するためのアクション。
-  * `google-github-actions/setup-gcloud`
-    * Google Cloud SDKをセットアップするアクション。
-
-
-
----
-
-### 時間で指定する場合
-
-```yaml
-on:
-  schedule:
-    # Cron形式でスケジュールを設定
-    # 毎日午前0時に実行
-    - cron: '0 0 * * *'
-```
-
-
-### checkout ステップの動作
-
-on: pushなどの場合は、`uses: actions/checkout@v3` は 
-トリガーされたブランチ のコードを自動的にチェックアウト（取得）します。
-
-on: schedule を指定した場合、特定のブランチは対象になりません。
-デフォルトブランチ（通常は main または master）の内容を基準に実行されます。
-
-
-```yaml
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3```
-```
-
-特定のブランチを対象にするには: 
-actions/checkout の ref を使って明示的にブランチを指定する必要があります。
-
-```yaml
-      - name: Checkout develop branch
-        uses: actions/checkout@v3
-        with:
-          ref: develop
-```
-
-
-checkout@v4 はセキュリティ・パフォーマンスの向上が含まれているため、@v3 よりも優れています。最新バージョンを使用することを推奨します。
-
-
-スケジュール実行でコードを取得する場合、actions/checkout がデフォルトブランチのコードをクローンします。
-例えば、以下のステップでクローンされるのはデフォルトブランチの内容です：
-
-
-### sshの設定方法
-
-* SSH秘密鍵をGitHub Secretsに追加
-
-(例)
-ローカルで新しいSSHキーを作成（例: id_rsa_github_actions）
-
-```bash
-ssh-keygen -t rsa -b 4096 -C "github-actions" -f id_rsa_github_actions
-```
-
-* 作成された秘密鍵（id_rsa_github_actions）の内容をGitHubリポジトリのSecretsに追加します
-
-GitHubのプロジェクトページのSettings - Secrets - Add a new secretの順にクリックし、
-例えば以下のような名前でそれぞれ登録してください。別の名前でも構いません。
-
-```sh
-SSH_KEY - SSH秘密鍵
-KNOWN_HOSTS - サーバーの公開鍵＋ホスト名/IPアドレス（.ssh/known_hostsファイルのフォーマト）
-```
-
-
-* 公開鍵（id_rsa_github_actions.pub）をデプロイ対象サーバーの ~/.ssh/authorized_keys に登録する
-* GitHub Actionsのワークフロー設定
-
-以下は実際にsshで接続する作業
-
-```bash
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Add known hosts
-        run: |
-          ssh-keyscan -H your-server-ip-or-hostname >> ~/.ssh/known_hosts
-
-     - name: Deploy to server
-        run: |
-          scp -r ./your-project-folder user@your-server-ip:/path/to/deploy
-          ssh user@your-server-ip "cd /path/to/deploy && ./restart-server.sh"
-```
-
-### 変数の設定
-
-#### GitHub Secretsを使った環境変数の管理
-
-GitHub Secretsは、デプロイ用のAPIキーやパスワードなどの機密データを安全に保存・管理するための方法です
-リポジトリの「Settings → Secrets and variables → Actions」から、
-New repository secret をクリックし、変数を登録します。
-
-GitHub ActionsでSecretsを使う Secretsを環境変数として利用できます。
-
-```bash
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Use Secrets as Environment Variables
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: |
-          echo "API Key is $API_KEY"
-          echo "Database Password is $DB_PASSWORD"
-```
-
-環境変数を .env ファイルで管理し、GitHub Actionsで利用することも可能です。
-ただし、.env ファイルには機密情報を直接記載しないように注意してください。
-
-
-```bash
-   - name: Load .env file
-        run: |
-          set -a
-          source .env
-          set +a
-```
+https://appj.pglikers.com/knowledge/open.knowledge/view/457
 
 ### Pythonコードを実行する方法
 

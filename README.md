@@ -40,8 +40,6 @@ docker exec -it act-container /bin/bash
 **actでワークフローを実行**
 ```sh
 act
-# ディレクトリを指定する
-act -W path/to/your/custom/folder
 # ymlを指定する方法
 act -j python-debug
 ```
@@ -56,6 +54,9 @@ act push
 ```sh
 act v
 ```
+
+act -j ssh-debug --secret-file .secrets
+
 
 ### 実行時のactイメージについての選択
 
