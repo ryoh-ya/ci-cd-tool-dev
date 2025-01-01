@@ -1,0 +1,35 @@
+name: SSH Server Connect
+
+on:
+  workflow_dispatch:
+jobs:
+  ssh-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SSH_SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Connect to server
+        run: |
+          # ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} "ls -la"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
+          if ! sudo systemctl is-active --quiet rocketchat; then
+            echo "Rocket.Chat is not running. Restarting..."
+            sudo systemctl restart rocketchat
+            if sudo systemctl is-active --quiet rocketchat; then
+              echo "Rocket.Chat restarted successfully."
+            else
+              echo "Failed to restart Rocket.Chat."
+              exit 1
+            fi
+          else
+            echo "Rocket.Chat is running fine."
+          fi
+          EOF

@@ -40,8 +40,6 @@ docker exec -it act-container /bin/bash
 **actでワークフローを実行**
 ```sh
 act
-# ディレクトリを指定する
-act -W path/to/your/custom/folder
 # ymlを指定する方法
 act -j python-debug
 ```
@@ -56,6 +54,9 @@ act push
 ```sh
 act v
 ```
+
+act -j ssh-debug --secret-file .secrets
+
 
 ### 実行時のactイメージについての選択
 
@@ -160,6 +161,13 @@ jenkins-cli console <JOB_NAME> <ビルド番号>
 **プラグインをインストールする**
 ```sh
 jenkins-cli build install-plugin <プラグイン名>
+```
+
+**ジョブの作成方法**
+(Jenkinsfileから実行/groovyスクリプトを自作)
+
+```sh
+jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
 ```
 
 ---

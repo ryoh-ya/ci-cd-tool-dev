@@ -5,24 +5,20 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
 
 - [Jenkinsの活用方法](#jenkinsの活用方法)
   - [Jenkinsの全体像について](#jenkinsの全体像について)
-  - [Jenkinsfileを書いてみる](#jenkinsfileを書いてみる)
+  - [Jenkinsfileの記載方法](#jenkinsfileの記載方法)
     - [ScriptedでできてDeclarativeでできないもの](#scriptedでできてdeclarativeでできないもの)
     - [Declarative（宣言型）パイプライン](#declarative宣言型パイプライン)
       - [**agentについて**](#agentについて)
       - [**stagesについて**](#stagesについて)
     - [環境変数を設定する場合](#環境変数を設定する場合)
+    - [stepsで処理の書き方](#stepsで処理の書き方)
     - [Pythonコードを実行する方法](#pythonコードを実行する方法)
-      - [Host側にPython環境を使用する場合](#host側にpython環境を使用する場合)
-      - [Dockerで一時的なPython環境を作成する方法](#dockerで一時的なpython環境を作成する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
-      - [jenkins/jenkins:lts](#jenkinsjenkinslts)
-        - [環境変数の設定を行う](#環境変数の設定を行う)
-        - [CLIコマンド](#cliコマンド)
-        - [JOBの作成方法](#jobの作成方法)
-      - [Jenkinsfile Runner](#jenkinsfile-runner)
-      - [jpi拡張子のWarningが表示される場合の対処方法](#jpi拡張子のwarningが表示される場合の対処方法)
+    - [ソースを取得する方法](#ソースを取得する方法)
+    - [pipelineの制御について](#pipelineの制御について)
+    - [データの保存方法について](#データの保存方法について)
 
-* Jenkins
+Jenkinsとは
   * オープンソースの継続的インテグレーション（CI）および継続的デリバリー（CD）ツール
   * ソフトウェア開発プロセスを自動化し、ビルド、テスト、デプロイを効率的に行うツール
 
@@ -58,7 +54,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
   * ステージ内で実行する具体的な処理内容を記述します。
 
 
-## Jenkinsfileを書いてみる
+## Jenkinsfileの記載方法
 
 Jenkinsで使用するパイプライン（CI/CDプロセス）をコードとして定義したファイル
 Jenkinsfileの基本的な書き方には2種類ある
@@ -69,6 +65,7 @@ Jenkinsfileの基本的な書き方には2種類ある
 ### ScriptedでできてDeclarativeでできないもの
 
 **DeclarativeとScriptedの比較**
+
 | **機能**                 | **Declarative** | **Scripted**   |
 |--------------------------|----------------|----------------|
 | 簡単な分岐（`if`構文）   | 可能（限定的）  | 可能（柔軟）   |
@@ -76,8 +73,6 @@ Jenkinsfileの基本的な書き方には2種類ある
 | 動的なノード割り当て       | 難しい           | 可能（柔軟）   |
 | 計算処理や状態管理         | 難しい           | 可能           |
 | 柔軟なプラグイン操作       | 限定的           | 自由度高い     |
-
-
 
 ### Declarative（宣言型）パイプライン
 
@@ -116,7 +111,10 @@ pipeline {
 agent { label 'docker' } // Dockerノードで実行する
 ```
 
-Dockerのイメージで実行する場合
+Dockerのイメージで実行する場合は
+HostマシンにDockerがインストールされている必要があります。
+
+
 
 ```groovy
 agent { 
@@ -126,10 +124,46 @@ agent {
   } // Dockerノードで実行する
 ```
 
+Scripted Pipelineの時の書き方
 
-Node内でDockerを使用する場合、
-HostマシンにDockerがインストールされている必要があります。
+```groovy
+node {
+    // 最初のコンテナ
+    docker.image('alpine:3.16').inside {
+        sh 'echo "Running in Alpine" > shared_file.txt'
+        sh 'ls -la'
+    }
+    // 次のコンテナ
+    docker.image('ubuntu:22.04').inside {
+        sh 'cat shared_file.txt'
+        sh 'echo "Running in Ubuntu" >> shared_file.txt'
+        sh 'ls -la'
+    }
+}
+```
 
+
+ユーザーで実行するときにpipがキャッシュディレクトリや
+システムレベルのパッケージディレクトリに書き込めずエラーになる
+
+対策1:ユーザーをrootで指定する
+
+```groovy
+docker {
+    image 'python:3.11-slim' // gcloud コマンド用の公式イメージ
+    args '-u root' // Dockerコンテナをrootユーザーで実行                    
+}
+```
+対策2:ユーザーレベルでインストールする
+
+```sh
+python -m pip install --upgrade --user pip
+python -m pip install --user requests
+```
+
+`pip install`などは同じDockerコンテナ内 であれば有効ですが、
+別のステージやステップ で再び異なるエージェント（Dockerコンテナ）が使われる場合、
+無効になります。
 
 
 
@@ -141,9 +175,7 @@ CI/CDプロセスを段階的に定義するセクション
   * stage("stage_name") // ステージ名を指定する
     * steps: シェルコマンドやスクリプトを記述
 
-
 ----
-
 
 ### 環境変数を設定する場合
 
@@ -154,235 +186,34 @@ environment {
 }
 ```
 
+### stepsで処理の書き方
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/454
+
 ### Pythonコードを実行する方法
 
-#### Host側にPython環境を使用する場合
-
-* (メリット)
-  * 設定が簡単（Pythonを一度インストールすれば、すぐに利用可能）
-  * オーバーヘッドが少ない。
-* (デメリット)
-  * 余分なソフトウェアをインストールする必要があるため、環境が汚れる。
-  * Pythonバージョンの切り替えや依存関係の管理が複雑
-  
-```groovy
-pipeline {
-    agent any
-    stages {
-        stage('Run Python Script') {
-            steps {
-                sh 'python3 --version'
-                sh 'python3 script.py'
-            }
-        }
-    }
-}
-```
-
-#### Dockerで一時的なPython環境を作成する方法
-
-* (メリット)
-  * 環境がクリーン
-  * 異なるPythonバージョンや依存関係を簡単に管理できる
-  * コンテナ終了時に全てのデータが削除される
-* (デメリット)
-  * DockerがHostにインストールされている必要がある
-  * コンテナの起動と終了のオーバーヘッドがある（軽微
-
-```groovy
-pipeline {
-    agent {
-        docker {
-            image 'python:3.10' // 使用するDockerイメージを指定
-            // image 'python:3.10-slim' 
-        }
-    }
-    stages {
-        stage('Run Python Script') {
-            steps {
-                sh '''
-                    python3 - <<EOF
-                    print("Hello, Jenkins!")
-                    for i in range(5):
-                        print(f"Number: {i}")
-                    EOF
-                '''
-            }
-        }
-    }
-}
-```
+https://appj.pglikers.com/knowledge/open.knowledge/view/451
 
 ### ローカル環境でJenkinsを実行する
 
-* Jenkinsの公式イメージがありますのでローカルで確認できます
-* Jenkinsfile Runnerにより軽微にpipelineの検証ができます
+https://appj.pglikers.com/knowledge/open.knowledge/view/452
 
-* jenkins/jenkins:lts
-  * フル機能のJenkins
-  * 完全なJenkins インスタンスが起動するため、すべてのJenkins機能を利用可能
-  * Jenkins GUI を無効化 → --httpPort=-1 を使用して GUI を停止
-* Jenkinsfile Runner
-  * 軽量で高速: Jenkinsfile をテストする目的で最適化されている
-  * 完全な Jenkins インスタンスを起動せずに Pipeline の動作確認ができます。
-  * Docker、pluginなどの機能が制限される
+### ソースを取得する方法
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/453
 
 
-https://github.com/jenkinsci/docker/blob/master/README.md#plugin-installation-manager-cli
+### pipelineの制御について
 
+* Jenkinsのジョブは並行ビルド（Parallel Buildをサポートしています。
 
-#### jenkins/jenkins:lts
-
-
-jenkins-cli.jarはJenkinsのWebサーバーから提供される
-
-jenkins-cli.jarはJenkins自体が提供するツールであり、Jenkinsサーバーのバージョンに合わせたCLIが`http://<JenkinsのURL>/jnlpJars/jenkins-cli.jar`からダウンロード可能です。
-
-```sh
-curl -o jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
+```groovy
+pipeline {
+options {
+    disableConcurrentBuilds() // 並行ビルドを無効化
+}
 ```
 
-* インストール時に実行されるスクリプト(init.groovy.d)
-  * ユーザー作成
-  * APIトークンを取得
-  * [setup.groovy](../jenkins/init.groovy.d/setup.groovy)
+### データの保存方法について
 
-
-##### 環境変数の設定を行う
-
-```sh
-source .env.setup 
-```
-
-上記を実行することにより
-`java -jar /var/jenkins_home/jenkins-cli.jar -s $JENKINS_URL -auth $JENKINS_AUTH`のエリアスが設定されて`jenkins-cli`が使えるようになる
-
-
-##### CLIコマンド
-
-**ヘルプを表示する**
-```sh
-jenkins-cli help
-```
-
-**ジョブ一覧を取得する**
-```sh
-jenkins-cli list-jobs
-```
-
-**ジョブの詳細情報を取得する**
-```sh
-jenkins-cli get-job <JOB_NAME>
-# jenkins-cli get-job example-job
-```
-
-**ジョブをビルド(実行)する**
-```sh
-jenkins-cli build <JOB_NAME>
-```
-
-**ビルド結果を取得する**
-* ジョブの最新のビルドログを表示します。
-```sh
-jenkins-cli console <JOB_NAME>
-# or
-jenkins-cli console <JOB_NAME> <ビルド番号>
-```
-
-**ジョブを削除する**
-```sh
-jenkins-cli delete-job <JOB_NAME>
-```
-
-
-**プラグインをインストールする**
-```sh
-jenkins-cli build install-plugin <プラグイン名>
-```
-
-
-##### JOBの作成方法
-
-**(groovyスクリプト)**
-```sh
-jenkins-cli groovy = < scripts/create-pipline-examole.groovy
-```
-
-**(config.xml形式)**
-```sh
-jenkins-cli create-job example-xml-job < scripts/job-config.xml
-```
-
-**(Jenkinsfileから実行/groovyスクリプトを自作)**
-```sh
-jenkins-cli groovy = < scripts/create-pipeline.groovy <ジョブ名> <pipefile>
-# jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
-```
-
-
-
-
-#### Jenkinsfile Runner
-
-jenkinsfile-runner を効果的に使うには、
-Dockerfile を利用して必要なツール(Nodeなど)や依存ライブラリを
-事前にイメージに組み込むことをお勧めします
-
-* Jenkinsのパイプラインスクリプト（Jenkinsfile）をローカル環境で実行できるツール。
-* Jenkinsをフルにセットアップせずに、Jenkinsfileをテスト可能。
-* Jenkinsfileのステージやステップを、軽量なコンテナ環境で再現。
-* Jenkinsパイプラインの学習・デバッグに最適。
-
-**(制限)**
-* agent { docker { ... } } のような Docker を直接利用する構文（Docker エージェントプラグインに依存する部分）はサポートされていません
-* plugInなど拡張機能等も使えない
-
-
-
-**(用途)**
-* ローカルでJenkinsfileをテストする
-  * Jenkinsのサーバーをセットアップせず、ローカルで素早く問題を発見・修正できる。
-  * プラグインや設定を確認しながら、スクリプトの正確性を検証可能。
-* 既存のJenkinsfileの動作確認
-  * チームやプロジェクト内のJenkinsfileをトリガーイベントに基づいてローカルで実行。
-  * プッシュやコミット前に、スクリプトの妥当性を検証。
-* Jenkinsの学習
-  * Jenkinsfileを記述・理解し、各ステップの動作を検証する学習プロセスに役立つ。
-
-**(制約)**
-* Jenkinsfile Runnerは内部的にコンテナを使用するため、Dockerが動作可能な環境が必要
-* plugInに対応できていない
-* Jenkinsサーバー依存の設定やリソースはRunner環境に完全移行できない
-  * 認証情報やシークレット管理は追加設定が必要。
-* Jenkinsの本番環境と動作が異なるケースがある
-  * 特定の外部リソースやカスタムエージェントを必要とするパイプラインでは注意が必要
-
-**(手順)**
-1. Dockerファイルを作成する
-    * [Dockerfile](../jenkins/Dockerfile)
-
-公式イメージは存在する
-```sh
-docker pull jenkins/jenkinsfile-runner
-```
-
-
-#### jpi拡張子のWarningが表示される場合の対処方法
-
-```
-WARNING hudson.ClassicPluginStrategy#createPluginWrapper: encountered /usr/share/jenkins/ref/plugins/cloudbees-folder.hpi under a nonstandard name; expected cloudbees-folder.jpi
-```
-
-このエラーメッセージは、Jenkinsfile Runnerがプラグインファイルの拡張子を
-予期している形式（.jpi）と異なる形式（.hpi）で検出したことを警告しています。
-.hpiと.jpiは基本的に同じ形式のファイルですが、
-Jenkinsの新しいバージョンでは.jpiを標準として採用しています。
-
-このエラーが発生しても機能的には問題なく動作する場合がありますが、以下の解決策で警告を修正できます。
-
-**解決方法**
-
-動作に問題なければ無視でも大丈夫です
-
----
-
+https://appj.pglikers.com/knowledge/open.knowledge/view/455

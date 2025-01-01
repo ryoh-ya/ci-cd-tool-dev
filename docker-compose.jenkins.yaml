@@ -7,6 +7,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
+      - ./python_project:/var/jenkins_home/source
       - ./jenkins/scripts:/var/jenkins_home/scripts
       - ./jenkins/pipelines:/var/jenkins_home/pipelines
       - /var/run/docker.sock:/var/run/docker.sock  # Dockerデーモンをコンテナ内で利用可能に
