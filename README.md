@@ -162,6 +162,13 @@ jenkins-cli console <JOB_NAME> <ビルド番号>
 jenkins-cli build install-plugin <プラグイン名>
 ```
 
+**ジョブの作成方法**
+(Jenkinsfileから実行/groovyスクリプトを自作)
+
+```sh
+jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
+```
+
 ---
 
 ## Google Cloud Build
@@ -215,6 +222,7 @@ gcloud config set project [PROJECT_ID]
 **ローカルでcloud buildをテスト**
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false .
+# cloud-build-local --config=gcloud/debug.cloudbuild.yaml --dryrun=false .
 ```
 
 
