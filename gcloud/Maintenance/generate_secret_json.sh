@@ -29,7 +29,7 @@ while IFS='=' read -r key value; do
   value=$(echo "$value" | sed 's/^"//' | sed 's/"$//')
 
   # 改行コードをエスケープ（\nをJSON用に\\nに変換）
-  value=$(echo "$value" | sed 's/\n/\\\n/g')
+  value=$(echo "$value" | sed 's/\\n/\\\\n/g')
 
   # ダブルクォートをエスケープ（JSONでのエスケープ）
   value=$(echo "$value" | sed 's/"/\\"/g')
