@@ -1,0 +1,39 @@
+name: notification smtp Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mail-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run some build step
+        run: exit 1 # テストで失敗をシミュレーション
+
+  notify-smpt:
+    needs: mail-test
+    runs-on: ubuntu-latest
+    if: failure() # 失敗した場合のみ実行
+    steps:
+      - name: Send notification email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # アドレスを指定すると送信ができたことを確認
+          server_address: 192.168.96.3
+          server_port: 1025
+          username: sender@example.com
+          password: password123
+          subject: "GitHub Action Failed:test"
+          body: |
+            Hello,
+
+            The GitHub Action "${{ github.workflow }}" has failed.
+            Job: ${{ github.job }}
+            Commit: ${{ github.sha }}
+            Check it here: ${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          to: recipient@example.com
+          from: sender@example.com
