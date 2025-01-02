@@ -1,4 +1,4 @@
-name: notification Test
+name: notification smtp Test
 
 on:
   workflow_dispatch:

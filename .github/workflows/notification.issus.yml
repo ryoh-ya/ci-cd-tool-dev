@@ -1,0 +1,28 @@
+name: notification issus Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  issus-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run some build step
+        run: exit 1 # テストで失敗をシミュレーション
+
+  notify-issus:
+    needs: issus-test
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Create GitHub Issue
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "GitHub Actions Failed: ${{ github.workflow }}"
+          content: |
+            The workflow ${{ github.workflow }} has failed.
+            Commit: ${{ github.sha }}
+            Details: ${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
