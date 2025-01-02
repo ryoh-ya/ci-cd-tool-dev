@@ -10,13 +10,14 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
     - [Declarative（宣言型）パイプライン](#declarative宣言型パイプライン)
       - [**agentについて**](#agentについて)
       - [**stagesについて**](#stagesについて)
-    - [環境変数を設定する場合](#環境変数を設定する場合)
     - [stepsで処理の書き方](#stepsで処理の書き方)
     - [Pythonコードを実行する方法](#pythonコードを実行する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
     - [ソースを取得する方法](#ソースを取得する方法)
     - [pipelineの制御について](#pipelineの制御について)
     - [データの保存方法について](#データの保存方法について)
+    - [環境変数及び認証情報の使い方](#環境変数及び認証情報の使い方)
+    - [SSHの接続方法](#sshの接続方法)
 
 Jenkinsとは
   * オープンソースの継続的インテグレーション（CI）および継続的デリバリー（CD）ツール
@@ -177,18 +178,11 @@ CI/CDプロセスを段階的に定義するセクション
 
 ----
 
-### 環境変数を設定する場合
-
-```groovy
-environment {
-    APP_ENV = 'production'
-    JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'
-}
-```
 
 ### stepsで処理の書き方
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/454
+
 
 ### Pythonコードを実行する方法
 
@@ -217,3 +211,11 @@ options {
 ### データの保存方法について
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/455
+
+### 環境変数及び認証情報の使い方
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/462
+
+### SSHの接続方法
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/463
