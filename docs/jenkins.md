@@ -179,6 +179,8 @@ CI/CDプロセスを段階的に定義するセクション
 
 ### 環境変数を設定する場合
 
+pipelineで環境変数を設定する
+
 ```groovy
 environment {
     APP_ENV = 'production'
