@@ -12,17 +12,23 @@ def pipelineDir = new File("/var/jenkins_home/pipelines")
 // ディレクトリをスキャンして各Jenkinsfileをジョブに登録
 pipelineDir.listFiles().each { file ->
     if (file.isFile() && file.name.endsWith("Jenkinsfile")) {
-        def jobName = file.name.replace("Jenkinsfile", "") // ファイル名をジョブ名に変換
+        def jobName = file.name.replace("Jenkinsfile", "")        
+        if (jobName.endsWith("_")){
+            jobName = jobName.substring(0, jobName.lastIndexOf("_"))
+        } 
+        if (jobName == ""){
+            jobName = "default"
+        }
 
         if (jenkins.getItem(jobName) == null) {
             println "Creating Pipeline job: ${jobName}"
-
             // Pipelineジョブを作成
             def job = new WorkflowJob(jenkins, jobName)
-            def pipelineScript = file.text
-            def definition = new CpsFlowDefinition(pipelineScript, true)
-            job.setDefinition(definition)
+            // def pipelineScript = file.text
+            // def definition = new CpsFlowDefinition(pipelineScript, true)
+            // job.setDefinition(definition)
 
+            // // ジョブを保存
             // ジョブを保存
             jenkins.add(job, jobName)
             job.save()
