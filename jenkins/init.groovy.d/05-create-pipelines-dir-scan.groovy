@@ -24,11 +24,10 @@ pipelineDir.listFiles().each { file ->
             println "Creating Pipeline job: ${jobName}"
             // Pipelineジョブを作成
             def job = new WorkflowJob(jenkins, jobName)
-            // def pipelineScript = file.text
-            // def definition = new CpsFlowDefinition(pipelineScript, true)
-            // job.setDefinition(definition)
+            def pipelineScript = file.text
+            def definition = new CpsFlowDefinition(pipelineScript, true)
+            job.setDefinition(definition)
 
-            // // ジョブを保存
             // ジョブを保存
             jenkins.add(job, jobName)
             job.save()
