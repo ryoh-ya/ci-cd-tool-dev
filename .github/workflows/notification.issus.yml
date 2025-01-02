@@ -17,6 +17,9 @@ jobs:
     needs: issues-test
     runs-on: ubuntu-latest
     if: failure()
+    permissions: # 通知はできていたが書き込みができなかったため追加
+      contents: read
+      issues: write # Issuesの書き込み権限を付与
     steps:
       - name: Prepare issue content
         run: |
