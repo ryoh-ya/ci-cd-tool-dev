@@ -17,6 +17,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
     - [pipelineの制御について](#pipelineの制御について)
     - [データの保存方法について](#データの保存方法について)
     - [環境変数及び認証情報の使い方](#環境変数及び認証情報の使い方)
+    - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
     - [SSHの接続方法](#sshの接続方法)
 
 Jenkinsとは
@@ -215,6 +216,10 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/455
 ### 環境変数及び認証情報の使い方
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/462
+
+### メール、Slack等に通知する方法
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/467
 
 ### SSHの接続方法
 

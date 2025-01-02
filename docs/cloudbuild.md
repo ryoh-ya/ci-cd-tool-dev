@@ -147,7 +147,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/461
 secretマネージャの制御方法
   * https://appj.pglikers.com/knowledge/open.knowledge/view/460
 
-### メール、Slack等に通知する方法 
+### メール、Slack等に通知する方法
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/466
 
