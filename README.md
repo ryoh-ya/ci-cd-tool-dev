@@ -172,8 +172,8 @@ jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jen
 ```
 
 jenkins-cli groovy = < scripts/creat
-
 jenkins-cli delete-credentials system::system::jenkins ssh-host-id
+jenkins-cli groovy = < scripts/create-pipelines
 
 ---
 
