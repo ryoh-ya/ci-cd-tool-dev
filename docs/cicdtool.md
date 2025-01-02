@@ -12,6 +12,8 @@
   * yamlベース
   * Dockerを中心にしたアプローチ
   * GitHubやGitLabを公式にサポート
+  * ステップの実装でやりにくいところ
+    * if制御、ステップの順番制御がやりにくい
 * [Jenkins](./jenkins.md)
   * nkinsfileというスクリプト形式(GitOpsベース)
   * Dockerコンテナの使用は任意であり、ジョブやステップごとに分離されない場合がある

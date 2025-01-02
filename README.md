@@ -246,7 +246,7 @@ bash ./Maintenance/register_secret_manager.sh
 bash ./Maintenance/update_secret_manager.sh 
 ```
 
-**ローカルでcloud buildをテスト**
+**ローカルでCloud Buildをテスト**
 
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false .
@@ -255,8 +255,12 @@ cloud-build-local --config=cloudbuild.yaml --dryrun=false .
 
 * -dryrunオプション
   * デフォルト: -dryrun=true
-  
+
 Cloud Buildの設定ファイルの構文チェック（Linting）と、コマンドの実行準備を行いますが、実際にはコマンドを実行しない
 
 
+**本番でCloud Buildを動かす**
 
+```sh
+gcloud builds submit --config=gcloud/notification.cloudbuild.yaml .
+```
