@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  issus-test:
+  issues-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -14,18 +14,20 @@ jobs:
         run: exit 1 # テストで失敗をシミュレーション
 
   notify-issus:
-    needs: issus-test
+    needs: issues-test
     runs-on: ubuntu-latest
     if: failure()
-    permissions: # 通知はできていたが書き込みができなかったため追加
-      contents: read
-      issues: write # Issuesの書き込み権限を付与
     steps:
+      - name: Prepare issue content
+        run: |
+          echo "The workflow ${{ github.workflow }} has failed." > issue-content.md
+          echo "Commit: ${{ github.sha }}" >> issue-content.md
+          echo "Details: ${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> issue-content.md
+
       - name: Create GitHub Issue
         uses: peter-evans/create-issue-from-file@v4
         with:
           title: "GitHub Actions Failed: ${{ github.workflow }}"
-          content: |
-            The workflow ${{ github.workflow }} has failed.
-            Commit: ${{ github.sha }}
-            Details: ${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          content-filepath: ./issue-content.md # ファイルを指定
+          labels: |
+            automated-issue
