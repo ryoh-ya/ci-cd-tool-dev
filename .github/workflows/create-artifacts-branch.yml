@@ -24,9 +24,7 @@ jobs:
       # 3. オリファンブランチを作成
       - name: Create orphan branch
         run: |
-          ls
           echo "Debug1"
-          git branch -a
           orphan=$(git branch -a|grep "remotes/origin/artifacts$") || :
           if [ -z "$orphan" ];then
             echo "Not Exists branch"
@@ -37,7 +35,6 @@ jobs:
             echo "Exists branch"
             git checkout artifacts
           fi
-          ls
           # 成果物をコピー
           if [ -d "dist" ]; then
             cp -r dist/* .
@@ -45,10 +42,11 @@ jobs:
             echo "Error: dist directory does not exist."
             exit 1
           fi
-      #   # 成果物をプッシュ
-      # - name: Push artifacts
-      #   run: |
-      #     # コミットしてプッシュ
-      #     git add README.md
-      #     git commit -m "Upload artifacts to orphan branch"
-      #     git push -f origin artifacts
+
+      # 4.成果物をプッシュ
+      - name: Push artifacts
+        run: |
+          # コミットしてプッシュ
+          git add README.md
+          git commit -m "Upload artifacts to orphan branch"
+          git push -f origin artifacts
