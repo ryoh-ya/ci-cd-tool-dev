@@ -32,8 +32,7 @@ jobs:
             echo "Not Exists branch"
             # 存在しない場合はブランチを作成する
             git checkout --orphan artifacts
-            git reset --hard
-            git rm -rf
+            git rm -rf .
           else
             echo "Exists branch"
             git checkout artifacts
