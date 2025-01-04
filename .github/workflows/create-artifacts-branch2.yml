@@ -1,0 +1,49 @@
+name: Create Artifact Branch
+on:
+  workflow_dispatch:
+
+jobs:
+  create-artfacts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # 1. リポジトリをチェックアウト
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # 2. 成果物を生成
+      - name: Build artifacts
+        run: |
+          mkdir dist
+          echo "This is a sample artifact" > dist/README.md
+          ls
+
+      # 3. オリファンブランチを作成
+      - name: Create orphan branch
+        run: |
+          # リモートブランチが存在するか確認
+          if git show-ref --verify --quiet refs/remotes/origin/artifacts-branch; then
+            echo "Branch 'artifacts-branch' already exists remotely. Deleting local and resetting..."
+            git branch -D artifacts-branch || true
+          fi
+
+          # オーファンブランチを作成
+          git checkout --orphan artifacts-branch
+          git rm -rf .
+
+          # 成果物をコピー
+          if [ -d "dist" ]; then
+            cp -r dist/* .
+          else
+            echo "Error: dist directory does not exist."
+            exit 1
+          fi
+
+      # 4.成果物をプッシュ
+      - name: Push artifacts
+        run: |
+          # コミットしてプッシュ
+          git add README.md
+          git commit -m "Upload artifacts to orphan branch"
+          git push -f origin artifacts
