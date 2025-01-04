@@ -5,11 +5,14 @@ on:
 jobs:
   create-artfacts:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       # 1. リポジトリをチェックアウト
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # 2. 成果物を生成
       - name: Build artifacts
