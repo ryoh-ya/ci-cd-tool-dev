@@ -1,5 +1,4 @@
-name: CI for Artifact Deployment
-
+name: Create Artifact Branch
 on:
   workflow_dispatch:
 
