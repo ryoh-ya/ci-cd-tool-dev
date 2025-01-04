@@ -31,15 +31,15 @@ jobs:
           if [ -z "$orphan" ];then
             echo "Not Exists branch"
             # 存在しない場合はブランチを作成する
-            # git checkout --orphan artifacts
-            # git rm -rf
+            git checkout --orphan artifacts
+            git rm -rf
           else
             echo "Exists branch"
             git checkout artifacts
           fi
-
-      #     # 成果物をコピー
-      #     cp -r dist/* .
+          ls
+          # 成果物をコピー
+          cp -r dist/* .
       #   # 成果物をプッシュ
       # - name: Push artifacts
       #   run: |
