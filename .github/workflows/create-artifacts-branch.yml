@@ -27,8 +27,8 @@ jobs:
           ls
           echo "Debug1"
           git branch -a
-          orphan=$(git branch -a|grep "remotes/origin/artifacts") || :
-          if [-z "$orphan" ];then
+          orphan=$(git branch -a|grep "remotes/origin/artifacts$") || :
+          if [ -z "$orphan" ];then
             echo "Not Exists branch"
             # 存在しない場合はブランチを作成する
             # git checkout --orphan artifacts
@@ -37,6 +37,7 @@ jobs:
             echo "Exists branch"
             git checkout artifacts
           fi
+
       #     # 成果物をコピー
       #     cp -r dist/* .
       #   # 成果物をプッシュ
