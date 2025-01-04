@@ -32,6 +32,7 @@ jobs:
             echo "Not Exists branch"
             # 存在しない場合はブランチを作成する
             git checkout --orphan artifacts
+            git reset --hard
             git rm -rf
           else
             echo "Exists branch"
@@ -39,7 +40,12 @@ jobs:
           fi
           ls
           # 成果物をコピー
-          cp -r dist/* .
+          if [ -d "dist" ]; then
+            cp -r dist/* .
+          else
+            echo "Error: dist directory does not exist."
+            exit 1
+          fi
       #   # 成果物をプッシュ
       # - name: Push artifacts
       #   run: |
