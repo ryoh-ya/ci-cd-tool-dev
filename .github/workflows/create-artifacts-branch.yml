@@ -22,7 +22,9 @@ jobs:
       - name: Create orphan branch
         run: |
           ls
+          echo "Debug1"
           orphan=$(git branch -a|grep "remotes/origin/artifacts")
+          echo "Debug2"
           if [-z "$orphan" ];then
             echo "Not Exists branch"
             # 存在しない場合はブランチを作成する
