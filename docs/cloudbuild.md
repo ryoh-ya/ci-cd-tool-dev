@@ -11,6 +11,7 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/447
   - [DockerイメージをビルドしてContainer Registryにプッシュする](#dockerイメージをビルドしてcontainer-registryにプッシュする)
   - [ローカルで実行する](#ローカルで実行する)
   - [環境変数・Secret Managerの管理](#環境変数secret-managerの管理-1)
+  - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
 
 
 CI/CDの実行ファイル
@@ -145,3 +146,8 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/461
 
 secretマネージャの制御方法
   * https://appj.pglikers.com/knowledge/open.knowledge/view/460
+
+### メール、Slack等に通知する方法
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/466
+
