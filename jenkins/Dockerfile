@@ -6,6 +6,10 @@ RUN apt-get update
 RUN apt-get install -y vim wget
 RUN rm -rf /var/lib/apt/lists/*
 
+# Jenkinsユーザーをsudoグループに追加
+RUN usermod -aG sudo jenkins
+# Jenkinsユーザーにパスワードなしでsudoを許可
+RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoe
 
 ## install docker
 RUN wget -O /tmp/docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-19.03.8.tgz
@@ -23,6 +27,7 @@ RUN groupadd -g 1001 docker || groupmod -g 1001 docker
 
 # Jenkinsユーザーをdockerグループに追加
 RUN usermod -aG docker jenkins
+
 
 USER jenkins
 

@@ -11,13 +11,13 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/438
       - [**agentについて**](#agentについて)
       - [**stagesについて**](#stagesについて)
     - [stepsで処理の書き方](#stepsで処理の書き方)
+    - [クラウドとの連携方法(GCP・AWSなど)](#クラウドとの連携方法gcpawsなど)
     - [Pythonコードを実行する方法](#pythonコードを実行する方法)
     - [ローカル環境でJenkinsを実行する](#ローカル環境でjenkinsを実行する)
     - [ソースを取得する方法](#ソースを取得する方法)
     - [pipelineの制御について](#pipelineの制御について)
     - [データの保存方法について](#データの保存方法について)
     - [環境変数及び認証情報の使い方](#環境変数及び認証情報の使い方)
-    - [メール、Slack等に通知する方法](#メールslack等に通知する方法)
     - [SSHの接続方法](#sshの接続方法)
 
 Jenkinsとは
@@ -184,6 +184,9 @@ CI/CDプロセスを段階的に定義するセクション
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/454
 
+### クラウドとの連携方法(GCP・AWSなど)
+
+https://appj.pglikers.com/knowledge/open.knowledge/view/470
 
 ### Pythonコードを実行する方法
 
@@ -216,10 +219,6 @@ https://appj.pglikers.com/knowledge/open.knowledge/view/455
 ### 環境変数及び認証情報の使い方
 
 https://appj.pglikers.com/knowledge/open.knowledge/view/462
-
-### メール、Slack等に通知する方法
-
-https://appj.pglikers.com/knowledge/open.knowledge/view/467
 
 ### SSHの接続方法
 

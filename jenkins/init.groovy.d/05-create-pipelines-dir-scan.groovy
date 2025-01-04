@@ -13,8 +13,8 @@ def pipelineDir = new File("/var/jenkins_home/pipelines")
 pipelineDir.listFiles().each { file ->
     if (file.isFile() && file.name.endsWith("Jenkinsfile")) {
         def jobName = file.name.replace("Jenkinsfile", "")        
-        if (jobName.endsWith("_")){
-            jobName = jobName.substring(0, jobName.lastIndexOf("_"))
+        if (jobName.endsWith(".")){
+            jobName = jobName.substring(0, jobName.lastIndexOf("."))
         } 
         if (jobName == ""){
             jobName = "default"
