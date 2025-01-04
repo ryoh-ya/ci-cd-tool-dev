@@ -43,10 +43,20 @@ jobs:
             exit 1
           fi
 
-      # 4.成果物をプッシュ
-      - name: Push artifacts
+      # 4.成果物をコミットする
+      - name: commit artifacts
         run: |
           # コミットしてプッシュ
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
           git commit -m "Upload artifacts to orphan branch"
-          git push -f origin artifacts
+
+      # 5. プッシュする
+      - name: Push artifacts
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: artifacts
+          force: true # ブランチを上書きする場合に使用
+
