@@ -24,17 +24,15 @@ jobs:
         run: |
           # リモートブランチが存在するか確認
           if git ls-remote --heads origin artifacts | grep -q artifacts; then
-            echo "Branch 'artifacts' already exists remotely. Deleting local and resetting..."
-            # リモートブランチをローカルに取得してチェックアウト
-            git fetch origin artifacts:artifacts
-            git checkout artifacts
-            ls
-          else
-            echo "Not Exists branch"
-            # オリファンブランチを作成
-            git checkout --orphan artifacts
-            git rm -rf .
+            echo "Branch 'artifacts' already exists remotely. Deleting remote branch..."
+            # リモートブランチを削除
+            git push origin --delete artifacts
           fi
+
+          echo "Creating orphan branch 'artifacts'..."
+          # オーファンブランチを作成
+          git checkout --orphan artifacts
+          git rm -rf .
 
           ls
           # 成果物をコピー
