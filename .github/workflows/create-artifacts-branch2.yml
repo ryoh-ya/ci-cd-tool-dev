@@ -1,4 +1,4 @@
-name: Create Artifact Branch
+name: Create Artifact Branch Update
 on:
   workflow_dispatch:
 
@@ -23,14 +23,15 @@ jobs:
       - name: Create orphan branch
         run: |
           # リモートブランチが存在するか確認
-          if git show-ref --verify --quiet refs/remotes/origin/artifacts-branch; then
-            echo "Branch 'artifacts-branch' already exists remotely. Deleting local and resetting..."
-            git branch -D artifacts-branch || true
+          if git ls-remote --heads origin artifacts | grep -q artifacts; then
+            echo "Branch 'artifacts' already exists remotely. Deleting local and resetting..."
+             git checkout artifacts
+          else
+            echo "Not Exists branch"
+            # オリファンブランチを作成
+            git checkout --orphan artifacts
+            git rm -rf .
           fi
-
-          # オーファンブランチを作成
-          git checkout --orphan artifacts-branch
-          git rm -rf .
 
           # 成果物をコピー
           if [ -d "dist" ]; then
