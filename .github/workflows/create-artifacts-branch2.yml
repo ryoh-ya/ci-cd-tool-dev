@@ -28,6 +28,7 @@ jobs:
             # リモートブランチをローカルに取得してチェックアウト
             git fetch origin artifacts:artifacts
             git checkout artifacts
+            ls
           else
             echo "Not Exists branch"
             # オリファンブランチを作成
@@ -35,6 +36,7 @@ jobs:
             git rm -rf .
           fi
 
+          ls
           # 成果物をコピー
           if [ -d "dist" ]; then
             cp -r dist/* .
@@ -46,7 +48,8 @@ jobs:
       # 4.成果物をコミットする
       - name: commit artifacts
         run: |
-          # コミットしてプッシュ
+          # コミット
+          ls
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
