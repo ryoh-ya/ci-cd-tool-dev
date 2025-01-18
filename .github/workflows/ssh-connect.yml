@@ -18,7 +18,7 @@ jobs:
 
       - name: Test SSH Connection
         run: |
-          ssh -T ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER_HOST }}
+          ssh -T ${{ secrets.SSH_USER }}@${{ vars.SSH_SERVER_HOST }}
 
       - name: Connect to server
         run: |
