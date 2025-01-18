@@ -22,9 +22,9 @@ jobs:
 
       - name: Connect to server
         run: |
-          # ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} "ls -la"
-          # ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
+          # ssh ${{ secrets.SSH_USER }}@${{ vars.SSH_SERVER_HOST }} "ls -la"
+          # ssh ${{ secrets.SSH_USER }}@${{ vars.SSH_SERVER_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ vars.SSH_SERVER_HOST }} << 'EOF'
           if ! sudo systemctl is-active --quiet rocketchat; then
             echo "Rocket.Chat is not running. Restarting..."
             sudo systemctl restart rocketchat
