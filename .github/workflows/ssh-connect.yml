@@ -16,10 +16,15 @@ jobs:
         run: |
           ssh-keyscan -H ${{ vars.SSH_SERVER_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Test SSH Connection
+        run: |
+          ssh -T ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER_HOST }}
+
       - name: Connect to server
         run: |
           # ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} "ls -la"
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
+          # ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER_HOST }} << 'EOF'
           if ! sudo systemctl is-active --quiet rocketchat; then
             echo "Rocket.Chat is not running. Restarting..."
             sudo systemctl restart rocketchat
