@@ -9,10 +9,6 @@ automatic_scaling:
 
 entrypoint: gunicorn -b :$PORT main:app
 
-skip_files:
-  - ^.*\.log$ # ログファイルを除外
-  - ^venv/ # 仮想環境ディレクトリを除外
-
 handlers:
   - url: /.*
     script: auto

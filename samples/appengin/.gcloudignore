@@ -1,0 +1,11 @@
+# .gcloudignore
+# ログファイルを除外
+*.log
+
+# 仮想環境ディレクトリを除外
+venv/
+
+# その他の不要なファイルを除外
+*.pyc
+__pycache__/
+.DS_Store
