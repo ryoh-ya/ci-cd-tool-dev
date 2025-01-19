@@ -63,4 +63,25 @@
 Webhook、SSHリポジトリなどを利用して連携が必要
 同じJavaのJenkinsが相性がよさそう。
 
+### CI/CDツールとGCP接続時の認証の整理
 
+推奨される設定方法
+
+* Jenkins
+  * サービスアカウント
+* Git Action
+  * Workload Identity
+* Google Cloud Build
+  * 特にサービスアカウントなしでアクセス可能
+
+#### Workload Identityについて
+
+  * サービスアカウントを使用せずにワークロードからGoogle Cloudにアクセスできます
+  * サービスアカウントキーの漏洩リスクをなくし、OIDCトークンなどを利用して安全にリソースへアクセス
+  * GitHub ActionsやAWSなど外部サービスからGoogle Cloudにアクセスする際に非常に有用です。
+    * プールを作成する(Workload Identity Poolは外部IDを認識するための基盤)
+      * ODICプロバインダを使用する(OIDCは、GCPが外部ワークロードを認証するために利用する標準プロトコル)
+      * プールIDがGoogle Cloudのリソースにアクセスできるようにする
+      * GCPリソースにアクセス可能なサービスアカウントを関連付けます
+  * Workload Identity Federationでは、外部のワークロードがGoogleサービスアカウントとして動作することを許可します。
+  * 外部ワークロードとは、GCPの外部で動作しているアプリケーションやプロセスのことを指します
