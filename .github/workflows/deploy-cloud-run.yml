@@ -27,19 +27,14 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2.1.0
 
-      - name: debug
-        run: |
-          ls
-          ls samples/cloud-run
+      - name: Configure Docker
+        run: gcloud auth configure-docker
 
-      # - name: Configure Docker
-      #   run: gcloud auth configure-docker
+      - name: Build Docker image
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA samples/cloudrun/
 
-      # - name: Build Docker image
-      #   run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA samples/cloud-run/
-
-      # - name: Push Docker image
-      #   run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA
+      - name: Push Docker image
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA
 
       # - name: Deploy to Cloud Run
       #   run: |
