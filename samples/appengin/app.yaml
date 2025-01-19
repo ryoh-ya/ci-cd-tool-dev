@@ -7,7 +7,8 @@ automatic_scaling:
   max_idle_instances: 0 # 必要以上のアイドルインスタンスを作らない
   max_instances: 1 # 最大インスタンス数を1に制限
 
-entrypoint: gunicorn -b :$PORT main:app
+# entrypoint: gunicorn -b :$PORT main:app
+entrypoint: python main.py
 
 handlers:
   - url: /.*
