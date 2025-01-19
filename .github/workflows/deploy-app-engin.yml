@@ -1,0 +1,36 @@
+name: Deploy to App Engine
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2.1.0
+
+      # app engineでデプロイする
+      - name: Deploy to App Engine
+        working-directory: samples/appengin
+        run: |
+          gcloud app deploy app.yaml --project ${{ secrets.GCP_PROJECT_ID }} --quiet
+          gcloud app browse --project ${{ secrets.GCP_PROJECT_ID }}
