@@ -25,15 +25,18 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
-        with:
-          version: "latest"
+        uses: google-github-actions/setup-gcloud@v2.1.0
 
-      - name: Configure Docker
-        run: gcloud auth configure-docker
+      - name: debug
+        run: |
+          ls
+          ls samples/cloud-run
 
-      - name: Build Docker image
-        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA samples/cloud-run/
+      # - name: Configure Docker
+      #   run: gcloud auth configure-docker
+
+      # - name: Build Docker image
+      #   run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA samples/cloud-run/
 
       # - name: Push Docker image
       #   run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ vars.APP_NAME }}:$GITHUB_SHA
