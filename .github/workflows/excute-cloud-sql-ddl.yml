@@ -33,4 +33,12 @@ jobs:
           chmod +x cloud-sql-proxy
           ./cloud-sql-proxy ${{ secrets.INSTANCE_CONNECTION_NAME }} &
 
+      # 4. SQL スクリプトを MySQL/PostgreSQL に適用
+      - name: Apply schema to MySQL
+        run: |                
+          export MYSQL_PWD=${{ secrets.DB_PASSWORD }}
+          # DDLファイルの確認
+          ls -l samples/cloudsql/schema_mysql.sql
+          mysql -u ${{ secrets.DB_USER }} -h 127.0.0.1 -P 3306 ${{ secrets.DB_NAME }} < samples/cloudsql/schema_mysql.sql
+          mysql -u ${{ secrets.DB_USER }} -h 127.0.0.1 -P 3306 -e "SHOW TABLES;" ${{ secrets.DB_NAME }}
 

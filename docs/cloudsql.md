@@ -255,6 +255,8 @@ gcloud sql connect [インスタンス名] --user=[ユーザー名]  --database=
 
 **Cloud SQL Auth Proxyを使用して接続**
 
+https://cloud.google.com/sql/docs/mysql/connect-auth-proxy?hl=ja
+
 1. Cloud SQL Auth Proxyをインストールする(公式サイトからインストール可能)
 2. Cloud SQL Auth Proxyを起動
    * `./cloud-sql-proxy [INSTANCE_CONNECTION_NAME]`
