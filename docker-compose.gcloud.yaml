@@ -9,7 +9,13 @@ services:
       # ローカルの gcloud 認証情報をコンテナに渡す
       - ~/.config/gcloud:/root/.config/gcloud
       # 現在のディレクトリをコンテナにマウント（プロジェクト用）
-      - ./gcloud/workspace:/workspace
+      - ./gcloud/workspace:/workspace/gcloud
+      - ./gcloud/Maintenance:/workspace/Maintenance
+      - ./.secrets:/workspace/.secrets
+      - ./python_project/src:/workspace/src
+      - ./python_project/tests:/workspace/tests
+      - ./python_project/requirements.txt:/workspace/requirements.txt
+      
       # Docker ソケットを共有して、Docker を利用可能にする
       - /var/run/docker.sock:/var/run/docker.sock
     stdin_open: true

@@ -1,0 +1,65 @@
+name: Apply DDL to Cloud SQL with OIDC
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_VERSION: ${{ vars.DB_VERSION }} # GitHub の環境変数を使用
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 2. Google Cloud CLI をセットアップ
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+
+      # 3. Cloud SQL Auth Proxy をセットアップ
+      - name: Start Cloud SQL Auth Proxy
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.0/cloud-sql-proxy.linux.amd64        
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy ${{ secrets.INSTANCE_CONNECTION_NAME }} &
+
+      # SQL スクリプトを MySQL に適用
+      - name: Apply schema to MySQL
+        run: |
+          export MYSQL_PWD=${{ secrets.DB_PASSWORD }}
+          export DB_VERSION=${{ env.DB_VERSION }}
+
+          echo "Applying DDL files based on DB_VERSION=$DB_VERSION"
+
+          # 該当するDDLファイルを取得して適用
+          find samples/cloudsql -type f -name "*_schema_mysql.sql" | awk -F'/' '
+          {
+            filename = $NF;
+            split(filename, parts, "_");
+            version = parts[1];
+
+            if (version >= ENVIRON["DB_VERSION"]) {
+              print filename;
+            }
+          }' | sort | while read file; do
+            echo "Applying $file"
+            mysql -u ${{ secrets.DB_USER }} -h 127.0.0.1 -P 3306 ${{ secrets.DB_NAME }} < "samples/cloudsql/$file"
+          done
+
+          # 結果確認
+          mysql -u ${{ secrets.DB_USER }} -h 127.0.0.1 -P 3306 -e "SHOW TABLES;" ${{ secrets.DB_NAME }}
+
+

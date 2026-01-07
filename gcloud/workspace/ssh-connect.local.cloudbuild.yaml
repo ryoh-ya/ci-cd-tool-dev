@@ -1,0 +1,33 @@
+steps:
+  - id: "Parse JSON"
+    name: "ubuntu"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        apt-get update && apt-get install -y jq openssh-client 
+        # Set up SSH
+        mkdir -p ~/.ssh
+        echo -e "$(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_PRIVATE_KEY')"  > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        echo $(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_USER')
+        # SSH Connnected(Nothing known hosts)
+        echo $(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_USER')@$(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_SERVER_HOST') 
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_USER')@$(echo "${_SSH_CREDENTIALS}" | jq -r '.SSH_SERVER_HOST') << 'EOF'
+        if ! sudo systemctl is-active --quiet rocketchat; then
+          echo "Rocket.Chat is not running. Restarting..."
+          sudo systemctl restart rocketchat
+          if sudo systemctl is-active --quiet rocketchat; then
+            echo "Rocket.Chat restarted successfully."
+          else
+            echo "Failed to restart Rocket.Chat."
+            exit 1
+          fi
+        else
+          echo "Rocket.Chat is running fine."
+        fi
+        EOF
+
+substitutions:
+  _SSH_CREDENTIALS: $(cat /workspace/.secrets.json)

@@ -14,6 +14,7 @@
   - [Google Cloud Build](#google-cloud-build)
     - [How To Use](#how-to-use-2)
       - [ローカルで実行する方法](#ローカルで実行する方法-2)
+        - [セットアップ](#セットアップ)
 
 
 ## Git Actions
@@ -40,6 +41,8 @@ docker exec -it act-container /bin/bash
 **actでワークフローを実行**
 ```sh
 act
+# ymlを指定する方法
+act -j python-debug
 ```
 
 pushイベントを実行したい場合
@@ -52,6 +55,9 @@ act push
 ```sh
 act v
 ```
+
+act -j ssh-debug --secret-file .secrets
+
 
 ### 実行時のactイメージについての選択
 
@@ -158,6 +164,17 @@ jenkins-cli console <JOB_NAME> <ビルド番号>
 jenkins-cli build install-plugin <プラグイン名>
 ```
 
+**ジョブの作成方法**
+(Jenkinsfileから実行/groovyスクリプトを自作)
+
+```sh
+jenkins-cli groovy = < scripts/create-pipeline.groovy example2-pipeline /var/jenkins_home/pipelines/Jenkinsfile
+```
+
+jenkins-cli groovy = < scripts/creat
+jenkins-cli delete-credentials system::system::jenkins ssh-host-id
+jenkins-cli groovy = < scripts/create-pipelines
+
 ---
 
 ## Google Cloud Build
@@ -169,6 +186,14 @@ jenkins-cli build install-plugin <プラグイン名>
 **コンテナをビルドする**
 ```sh
 docker-compose -f docker-compose.gcloud.yaml build
+```
+
+```sh
+docker-compose -f docker-compose.gcloud.yaml up -d
+```
+
+```sh
+docker-compose -f docker-compose.gcloud.yaml exec -it gcloud bash
 ```
 
 **コンテナを起動して中に入る**
@@ -207,65 +232,125 @@ gcloud projects list
 gcloud config set project [PROJECT_ID]
 ```
 
+##### セットアップ
 
-**ローカルでcloud buildをテスト**
+.secrets.jsonを生成する
+
+```sh
+bash ./Maintenance/generate_secret_json.sh
+```
+
+.secrets.jsonを登録する
+
+```sh
+bash ./Maintenance/register_secret_manager.sh 
+```
+
+```sh
+bash ./Maintenance/update_secret_manager.sh 
+```
+
+**ローカルでCloud Buildをテスト**
+
 ```sh
 cloud-build-local --config=cloudbuild.yaml --dryrun=false .
+# cloud-build-local --config=gcloud/debug.cloudbuild.yaml --dryrun=false .
 ```
 
+* -dryrunオプション
+  * デフォルト: -dryrun=true
 
--dryrun オプションの意味
-デフォルト: -dryrun=true
-Cloud Build の設定ファイル（cloudbuild.yaml）の構文チェック（Linting）と、
-コマンドの実行準備を行いますが、実際にはコマンドを実行しません。
-
--dryrun=false: コマンドを実際に実行します。
-
-ビルドやコマンドを実際に実行する前に、
-cloudbuild.yaml ファイルの構文や手順に問題がないか確認するために使用します。
-テスト実行のような使い方ができます。
+Cloud Buildの設定ファイルの構文チェック（Linting）と、コマンドの実行準備を行いますが、実際にはコマンドを実行しない
 
 
-```log
-BUILD
-: Pulling image: alpine
-: Using default tag: latest
-2024/12/28 11:36:57 Error updating token in metadata server: Post "http://localhost:8082/token": dial tcp 127.0.0.1:8082: connect: connection refused
-: latest: Pulling from library/alpine
-: 38a8310d387e: Already exists
-: Digest: sha256:21dc6063fd678b478f57c0e13f47560d0ea4eeba26dfc947b2a4f81f686b9f45
-: Status: Downloaded newer image for alpine:latest
-: docker.io/library/alpine:latest
-: Hello, Cloud Build!
-2024/12/28 11:37:10 Step  finished
-2024/12/28 11:37:10 status changed to "DONE"
-DONE
-```
-
-```log
-Error updating token in metadata server: Post "http://localhost:8082/token": dial tcp 127.0.0.1:8082: connect: connection refused
-```
-cloud-build-local がローカル環境で実行される際、Google Cloud Build のような環境をシミュレートするために使用される「偽のメタデータサーバー」との通信が失敗したことを示しています。
-
-**(内容)**
-ローカル環境で Google Cloud Build のメタデータエミュレーションが完全に動作しない場合に発生する軽微な問題で、ビルド自体の成功や結果には影響を与えません。
-
-Google Container Registry (GCR) や Artifact Registry にアクセスする必要がある場合は
-gcloud の認証トークンが必要ですが、このエラーが発生するとトークンが正しく取得できない可能性があります。
-
-**(対応策)**
-
-方法①:コンテナ内で以下を実行して、明示的に認証情報を設定します
+**本番でCloud Buildを動かす**
 
 ```sh
-gcloud auth login
-gcloud auth application-default login
+gcloud builds submit --config=gcloud/notification.cloudbuild.yaml .
 ```
 
-方法 2: --experimental_local オプションの利用
 
-cloud-build-local の一部の機能を無効化することで、
-メタデータサーバーに依存しない構成にできます。
-```sh
-cloud-build-local --config=cloudbuild.yaml --dryrun=false --experimental_local .
-```
+1. persist-credentials: false
+このオプションは、チェックアウト時の認証情報の保持を制御します。
+
+デフォルト値: true
+
+認証情報（GITHUB_TOKEN）が保持され、以降のGit操作（プッシュやフェッチなど）で自動的に使用されます。
+false に設定した場合:
+
+チェックアウト後に、認証情報が削除されるため、以降のGit操作で認証エラーが発生する可能性があります。
+この場合、後続のGit操作で手動で認証情報を設定する必要があります。
+結論: この場合の影響
+persist-credentials: false を指定すると、git push や git fetch を実行する際にエラーが発生する可能性があります。通常、persist-credentials: true（デフォルト）にしておいたほうが簡単で安全です。
+
+
+はい、uses: actions/checkout@v3 の withオプションはGitHub Actionsの挙動に大きく影響します。以下、それぞれのオプションについて説明します：
+
+1. persist-credentials: false
+このオプションは、チェックアウト時の認証情報の保持を制御します。
+
+デフォルト値: true
+
+認証情報（GITHUB_TOKEN）が保持され、以降のGit操作（プッシュやフェッチなど）で自動的に使用されます。
+false に設定した場合:
+
+チェックアウト後に、認証情報が削除されるため、以降のGit操作で認証エラーが発生する可能性があります。
+この場合、後続のGit操作で手動で認証情報を設定する必要があります。
+結論: この場合の影響
+persist-credentials: false を指定すると、git push や git fetch を実行する際にエラーが発生する可能性があります。通常、persist-credentials: true（デフォルト）にしておいたほうが簡単で安全です。
+
+解決策（もし認証情報を削除したい場合）
+手動で認証情報を設定します。たとえば：
+
+yaml
+Copy code
+- name: Configure Git authentication
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+または、GITHUB_TOKEN を明示的に使用します：
+
+yaml
+Copy code
+- name: Set up Git authentication
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+2. fetch-depth: 0
+このオプションは、リポジトリをクローンする際に取得する履歴の深さを制御します。
+
+デフォルト値: 1
+
+最新の1コミットだけを取得します（浅いクローン）。
+0 に設定した場合:
+
+リポジトリ全体の履歴（すべてのコミット）が取得されます。
+結論: この場合の影響
+fetch-depth: 0 の利点:
+
+全履歴が必要な操作（例: 古いブランチの操作や、git log の使用）に対応できます。
+git branch -a や git ls-remote のようなコマンドが正確に動作します。
+fetch-depth: 1（デフォルト）の場合の制約:
+
+浅いクローンだと、一部のGit操作（リモートブランチのチェックやフルログの取得）が制限される可能性があります。
+リモートの artifacts ブランチが正しく認識されない場合があります。
+推奨設定
+fetch-depth: 0 を使用することで、リモートブランチ操作（git fetch, git checkout）やリポジトリ全体を扱う操作が確実に動作します。今回のようにブランチの確認や作成を行う場合には、fetch-depth: 0 を使うべきです。
+
+
+          # すべてのリモートブランチをフェッチ
+          git fetch origin --prune
+
+          # artifacts ブランチがリモートに存在するか確認
+          if git ls-remote --exit-code --heads origin artifacts; then
+            echo "Branch 'artifacts' exists. Checking it out..."
+            git checkout artifacts
+          else
+            echo "Branch 'artifacts' does not exist. Creating it..."
+            git checkout --orphan artifacts
+            git rm -rf --cached .
+          fi
+
+
+git config --local user.email

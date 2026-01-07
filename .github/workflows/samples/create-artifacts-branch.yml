@@ -1,0 +1,62 @@
+name: Create Artifact Branch
+on:
+  workflow_dispatch:
+
+jobs:
+  create-artfacts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # 1. リポジトリをチェックアウト
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # 2. 成果物を生成
+      - name: Build artifacts
+        run: |
+          mkdir dist
+          echo "This is a sample artifact" > dist/README.md
+          ls
+
+      # 3. オリファンブランチを作成
+      - name: Create orphan branch
+        run: |
+          echo "Debug1"
+          orphan=$(git branch -a|grep "remotes/origin/artifacts$") || :
+          if [ -z "$orphan" ];then
+            echo "Not Exists branch"
+            # 存在しない場合はブランチを作成する
+            git checkout --orphan artifacts
+            git rm -rf .
+          else
+            echo "Exists branch"
+            git checkout artifacts
+          fi
+          # 成果物をコピー
+          if [ -d "dist" ]; then
+            cp -r dist/* .
+          else
+            echo "Error: dist directory does not exist."
+            exit 1
+          fi
+
+      # 4.成果物をコミットする
+      - name: commit artifacts
+        run: |
+          # コミットしてプッシュ
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Upload artifacts to orphan branch"
+
+      # 5. プッシュする
+      - name: Push artifacts
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: artifacts
+          force: true # ブランチを上書きする場合に使用
+

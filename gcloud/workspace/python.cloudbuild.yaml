@@ -1,0 +1,44 @@
+steps:
+  # ソースコードを取得(ローカルで実行する場合は不要)
+  #- id: checkout
+  #  name: "gcr.io/cloud-builders/git"
+  #  args: ["clone", "https://github.com/YOUR_REPOSITORY.git"]
+
+  - id: pip_install
+    name: "python:3.11-slim"
+    entrypoint: pip
+    args:
+      - install
+      - requests
+      - --user
+      # --use: Pythonの pip コマンドが「グローバル環境」にパッケージをインストールするのではなく、ユーザーのローカル環境（~/.local 配下）にインストールする
+      # これを付けないと次のステップに繋がらなかった。
+
+  - id: run_py_script
+    name: "python:3.11-slim"
+    waitFor:
+      - pip_install
+    entrypoint: "python"
+    args:
+      - "-c"
+      - |
+        import requests
+
+        url = "https://example.com"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            # print("API call succeeded:", response.json())
+            print("API call succeeded:")
+        else:
+            print("API call failed with status code:", response.status_code)
+            raise Exception("API call failed")
+
+  - id: run_py_file
+    name: "python:3.11-slim"
+    waitFor:
+      - run_py_script
+    dir: "src" # /workspace/src を基準にする
+    entrypoint: "python"
+    args:
+      - "main.py"

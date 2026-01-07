@@ -1,0 +1,39 @@
+steps:
+  - id: run_test
+    name: "python:3.11-slim"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        python -m pytest --junitxml=pytest.xml --cov-report term-missing --cov=src tests/ | tee pytest-coverage.txt
+        coverage-badge -o coverage.svg
+        python - <<EOF
+        from src.lib.generate_coverage import GenerateCoverage
+        generate_coverage = GenerateCoverage()
+        generate_coverage.save_table()
+        EOF
+
+  - id: create_readme
+    name: "bash"
+    waitFor:
+      - run_test
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        ls
+        echo "# Pytest Report" > README.md
+        echo "" >> README.md
+        echo "![test](coverage.svg)" >> README.md
+        echo "" >> README.md
+        cat tests/table.md >> README.md
+        cat README.md
+
+artifacts:
+  objects:
+    location: "gs://gcf-sample-folder/artifacts/"
+    paths:
+      - README.md
+      - coverage.svg

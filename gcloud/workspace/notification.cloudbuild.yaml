@@ -1,0 +1,42 @@
+steps:
+  - name: "ubuntu"
+    id: "task1"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        ls -l
+        echo "Running task1..."
+        # echo "task1 failed" > /workspace/_failed
+        # exit 1
+
+  - name: "ubuntu"
+    id: "task2"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        ls -l
+        if [[ -f "/workspace/_failed" ]]; then 
+          echo "Skipping task2..."
+        else
+          echo "Running task2..."
+          echo "task2 failed" > /workspace/_failed
+          exit 1
+        fi
+    allowFailure: true # 失敗を無視
+
+  - name: "python:3.11-slim"
+    id: "notify"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        ls -l
+        if [[ -f "/workspace/_failed" ]]; then
+          echo "mail send process"
+          python src/lib/send_smtp_mail.py
+        else
+          echo "No failures detected. Skipping notification."
+        fi
+    waitFor: ["task1", "task2"]

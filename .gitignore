@@ -1,1 +1,15 @@
 .env
+.secrets
+.secrets.json
+*service-account.json
+
+__pycache__
+python_project/.coverage
+python_project/coverage.svg
+python_project/pytest-coverage.txt
+python_project/pytest.xml
+python_project/README.md
+coverage_table.md
+pytest-coverage.txt
+pytest.xml
+.pytest_cache
