@@ -1,6 +1,4 @@
 import pytest
-from io import StringIO
-import sys
 from src.main import hello_world
 
 
