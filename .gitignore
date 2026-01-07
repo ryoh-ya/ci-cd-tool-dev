@@ -13,3 +13,7 @@ coverage_table.md
 pytest-coverage.txt
 pytest.xml
 .pytest_cache
+
+
+.venv/
+venv/
