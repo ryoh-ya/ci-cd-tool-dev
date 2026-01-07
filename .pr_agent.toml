@@ -1,0 +1,16 @@
+[config]
+model = "gpt-5-mini"
+
+[pr_reviewer]
+extra_instructions = """
+You must respond in Japanese.
+Do not use emojis.
+Use half-width punctuation.
+"""
+
+[pr_description]
+extra_instructions = """
+You must respond in Japanese.
+Do not use emojis.
+Use half-width punctuation.
+"""
