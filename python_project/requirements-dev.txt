@@ -11,3 +11,5 @@ ruff==0.14.7
 sphinx
 sphinx-rtd-theme
 autodoc
+# security auditing
+pip-audit
